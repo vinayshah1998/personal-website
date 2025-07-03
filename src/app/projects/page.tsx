@@ -95,7 +95,7 @@ export default function Projects() {
           or want to collaborate, let's chat!
         </p>
         <a 
-          href="mailto:your.email@example.com"
+          href="mailto:vinayshah2006@gmail.com"
           className="text-blue-600 dark:text-blue-400 hover:underline"
         >
           Get in touch →
