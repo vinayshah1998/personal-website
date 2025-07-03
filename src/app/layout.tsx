@@ -1,0 +1,57 @@
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+});
+
+export const metadata: Metadata = {
+  title: "Your Name - Personal Website",
+  description: "Personal website and portfolio",
+  keywords: ["developer", "portfolio", "projects", "web development"],
+  authors: [{ name: "Your Name" }],
+  creator: "Your Name",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://yourwebsite.com",
+    title: "Your Name - Personal Website",
+    description: "Personal website and portfolio",
+    siteName: "Your Name",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Your Name - Personal Website",
+    description: "Personal website and portfolio",
+    creator: "@yourusername",
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="en" className={inter.className}>
+      <body className="antialiased bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+        <div className="min-h-screen flex flex-col">
+          <header className="py-6 border-b border-gray-200 dark:border-gray-800">
+            <div className="max-w-2xl mx-auto px-6 flex justify-between items-center">
+              <h1 className="text-lg font-semibold">Your Name</h1>
+              <Navigation />
+            </div>
+          </header>
+          <main className="flex-1">
+            {children}
+          </main>
+          <Footer />
+        </div>
+      </body>
+    </html>
+  );
+}
