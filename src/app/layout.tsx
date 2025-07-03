@@ -10,24 +10,24 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Your Name - Personal Website",
+  title: "Vinay Shah's Website",
   description: "Personal website and portfolio",
   keywords: ["developer", "portfolio", "projects", "web development"],
-  authors: [{ name: "Your Name" }],
-  creator: "Your Name",
+  authors: [{ name: "Vinay Shah" }],
+  creator: "Vinay Shah",
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://yourwebsite.com",
-    title: "Your Name - Personal Website",
+    title: "Vinay Shah - Personal Website",
     description: "Personal website and portfolio",
-    siteName: "Your Name",
+    siteName: "Vinay Shah",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Your Name - Personal Website",
+    title: "Vinay Shah - Personal Website",
     description: "Personal website and portfolio",
-    creator: "@yourusername",
+    creator: "@vinayshah1998",
   },
 };
 
@@ -42,7 +42,7 @@ export default function RootLayout({
         <div className="min-h-screen flex flex-col">
           <header className="py-6 border-b border-gray-200 dark:border-gray-800">
             <div className="max-w-2xl mx-auto px-6 flex justify-between items-center">
-              <h1 className="text-lg font-semibold">Your Name</h1>
+              <h1 className="text-lg font-semibold">Vinay Shah</h1>
               <Navigation />
             </div>
           </header>

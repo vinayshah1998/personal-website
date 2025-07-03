@@ -7,7 +7,7 @@ export default function About() {
       
       <div className="prose prose-gray dark:prose-invert max-w-none">
         <p className="text-lg text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
-          I'm a passionate software engineer with [X years] of experience in [your field]. 
+          I'm a passionate software engineer.
           I love creating solutions that are both functional and beautiful.
         </p>
         
@@ -40,10 +40,10 @@ export default function About() {
               Interests
             </h3>
             <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-              <li>• Interest 1</li>
-              <li>• Interest 2</li>
-              <li>• Interest 3</li>
-              <li>• Interest 4</li>
+              <li>• Building</li>
+              <li>• Baking</li>
+              <li>• Running</li>
+              <li>• Gaming</li>
             </ul>
           </div>
         </div>
@@ -58,13 +58,13 @@ export default function About() {
         
         <div className="mt-6 flex gap-4">
           <a 
-            href="mailto:your.email@example.com" 
+            href="mailto:vinayshah2006@gmail.com" 
             className="text-blue-600 dark:text-blue-400 hover:underline"
           >
             Email
           </a>
           <a 
-            href="https://github.com/yourusername" 
+            href="https://github.com/vinayshah1998" 
             className="text-blue-600 dark:text-blue-400 hover:underline"
             target="_blank" 
             rel="noopener noreferrer"
@@ -72,7 +72,7 @@ export default function About() {
             GitHub
           </a>
           <a 
-            href="https://linkedin.com/in/yourusername" 
+            href="https://linkedin.com/in/vinay-s-shah" 
             className="text-blue-600 dark:text-blue-400 hover:underline"
             target="_blank" 
             rel="noopener noreferrer"
