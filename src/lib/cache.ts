@@ -5,7 +5,7 @@ interface CacheEntry<T> {
 }
 
 class SimpleCache {
-  private cache = new Map<string, CacheEntry<any>>();
+  private cache = new Map<string, CacheEntry<unknown>>();
 
   set<T>(key: string, data: T, ttlMinutes: number = 10): void {
     this.cache.set(key, {
