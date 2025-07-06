@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
+import { SpeedInsights } from "@vercel/speed-insights/next"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://yourwebsite.com",
+    url: "https://vinayshah.dev",
     title: "Vinay Shah - Personal Website",
     description: "Personal website and portfolio",
     siteName: "Vinay Shah",
@@ -52,6 +53,7 @@ export default function RootLayout({
           <Footer />
         </div>
       </body>
+      <SpeedInsights />
     </html>
   );
 }

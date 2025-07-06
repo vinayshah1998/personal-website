@@ -1,5 +1,3 @@
-import { SpeedInsights } from "@vercel/speed-insights/next"
-
 export default function Home() {
   return (
     <div className="max-w-2xl mx-auto px-6 py-16">
@@ -41,7 +39,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <SpeedInsights />
     </div>
   );
 }
