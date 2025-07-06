@@ -3,6 +3,10 @@
 import { useState, useEffect } from 'react';
 import type { StravaStats, StravaActivity } from '@/lib/strava';
 
+const METERS_TO_MILES = 0.000621371;
+
+const formatDistance = (meters: number) => (meters * METERS_TO_MILES).toFixed(1);
+
 interface StatsCardProps {
   title: string;
   count: number;
@@ -12,7 +16,6 @@ interface StatsCardProps {
 }
 
 const StatsCard = ({ title, count, distance, time, elevation }: StatsCardProps) => {
-  const formatDistance = (meters: number) => (meters / 1000).toFixed(1);
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -33,7 +36,7 @@ const StatsCard = ({ title, count, distance, time, elevation }: StatsCardProps) 
         </div>
         <div>
           <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-            {formatDistance(distance)} km
+            {formatDistance(distance)} mi
           </p>
           <p className="text-sm text-gray-600 dark:text-gray-400">Distance</p>
         </div>
@@ -55,7 +58,6 @@ const StatsCard = ({ title, count, distance, time, elevation }: StatsCardProps) 
 };
 
 const RecentActivity = ({ activity }: { activity: StravaActivity }) => {
-  const formatDistance = (meters: number) => (meters / 1000).toFixed(1);
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
@@ -75,7 +77,7 @@ const RecentActivity = ({ activity }: { activity: StravaActivity }) => {
       </div>
       <div className="text-right">
         <p className="font-semibold text-gray-900 dark:text-gray-100">
-          {formatDistance(activity.distance)} km
+          {formatDistance(activity.distance)} mi
         </p>
         <p className="text-sm text-gray-600 dark:text-gray-400">
           {Math.round(activity.moving_time / 60)} min
