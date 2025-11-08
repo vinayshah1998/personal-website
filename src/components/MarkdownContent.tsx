@@ -23,8 +23,7 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
               </code>
             ) : (
               <SyntaxHighlighter
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                style={vscDarkPlus as any}
+                style={vscDarkPlus}
                 language={match[1]}
                 PreTag="div"
               >
