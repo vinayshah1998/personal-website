@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
@@ -44,7 +45,11 @@ export default function RootLayout({
         <div className="min-h-screen flex flex-col">
           <header className="py-6 border-b border-gray-200 dark:border-gray-800">
             <div className="max-w-4xl mx-auto px-6 flex justify-between items-center">
-              <h1 className="text-lg font-semibold">Vinay Shah</h1>
+              <Link href="/">
+                <h1 className="text-lg font-semibold whitespace-nowrap hover:text-gray-600 dark:hover:text-gray-400 transition-colors cursor-pointer">
+                  Vinay Shah
+                </h1>
+              </Link>
               <Navigation />
             </div>
           </header>

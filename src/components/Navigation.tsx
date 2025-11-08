@@ -7,7 +7,6 @@ const Navigation = () => {
   const pathname = usePathname()
 
   const navItems = [
-    { name: 'Home', href: '/' },
     { name: 'About', href: '/about' },
     { name: 'Projects', href: '/projects' },
     { name: 'Blog', href: '/blog' },
@@ -15,7 +14,7 @@ const Navigation = () => {
   ]
 
   return (
-    <nav className="flex items-center gap-8">
+    <nav className="flex items-center gap-4 md:gap-8">
       {navItems.map((item) => {
         const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
 
