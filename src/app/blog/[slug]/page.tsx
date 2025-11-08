@@ -46,7 +46,7 @@ export default async function BlogPostPage({ params }: PageProps) {
   }
 
   return (
-    <article className="max-w-2xl mx-auto px-6 py-16">
+    <article className="max-w-4xl mx-auto px-6 py-16">
       <Link
         href="/blog"
         className="inline-block mb-8 text-blue-600 dark:text-blue-400 hover:underline"
