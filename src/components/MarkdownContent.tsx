@@ -13,20 +13,20 @@ export default function MarkdownContent({ content }: MarkdownContentProps) {
     <div className="prose prose-lg dark:prose-invert max-w-none">
       <ReactMarkdown
         components={{
-          code({ className, children, ...props }) {
+          code({ className, children }) {
             const match = /language-(\w+)/.exec(className || '');
             const inline = !match;
 
             return inline ? (
-              <code className={className} {...props}>
+              <code className={className}>
                 {children}
               </code>
             ) : (
               <SyntaxHighlighter
-                style={vscDarkPlus}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                style={vscDarkPlus as any}
                 language={match[1]}
                 PreTag="div"
-                {...props}
               >
                 {String(children).replace(/\n$/, '')}
               </SyntaxHighlighter>
