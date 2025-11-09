@@ -1,26 +1,10 @@
 const projects = [
   {
     id: 1,
-    title: "Project One",
-    description: "A detailed description of your first project. What problem it solves, technologies used, and your role in the project.",
-    tech: ["React", "TypeScript", "Node.js"],
-    link: "https://github.com/yourusername/project-one",
-    demo: "https://project-one-demo.com"
-  },
-  {
-    id: 2,
-    title: "Project Two", 
-    description: "Another project that showcases different skills. Explain the challenges you faced and how you overcame them.",
-    tech: ["Next.js", "Tailwind CSS", "PostgreSQL"],
-    link: "https://github.com/yourusername/project-two",
-    demo: "https://project-two-demo.com"
-  },
-  {
-    id: 3,
-    title: "Project Three",
-    description: "A third project that demonstrates your growth and learning. Focus on the impact and results achieved.",
-    tech: ["Python", "FastAPI", "Docker"],
-    link: "https://github.com/yourusername/project-three",
+    title: "LuckyNumber",
+    description: "A privacy-focused iOS app that randomly selects contacts and initiates phone calls with a \"lucky number\" twist. Built to explore iOS contacts permissions and SwiftUI's reactive architecture, the app features multiple selection algorithms including random, weighted-by-frequency, and recency-based strategies. Tackled significant performance challenges when handling 2000+ contacts by implementing background processing and lazy loading, reducing startup time from 3 seconds to under 100ms. The app fully supports iOS 18's new limited contacts access feature, respecting user privacy choices while maintaining full functionality with as few as 1-3 selected contacts.",
+    tech: ["Swift", "SwiftUI", "iOS 18", "MVVM", "Async/Await", "Contacts Framework"],
+    link: "https://github.com/yourusername/LuckyNumber",
     demo: null
   }
 ]
