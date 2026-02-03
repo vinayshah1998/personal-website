@@ -5,7 +5,12 @@ const nextConfig: NextConfig = {
   trailingSlash: true,
   images: {
     unoptimized: true
-  }
+  },
+  experimental: {
+    staleTimes: {
+      dynamic: 600, // 10 minutes - matches ISR revalidate period
+    },
+  },
 };
 
 export default nextConfig;
