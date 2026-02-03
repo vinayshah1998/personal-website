@@ -1,6 +1,3 @@
-'use client';
-
-import { useState, useEffect } from 'react';
 import type { StravaStats, StravaActivity } from '@/lib/strava';
 
 const METERS_TO_MILES = 0.000621371;
@@ -87,72 +84,12 @@ const RecentActivity = ({ activity }: { activity: StravaActivity }) => {
   );
 };
 
-export default function StravaStats() {
-  const [stats, setStats] = useState<StravaStats | null>(null);
-  const [activities, setActivities] = useState<StravaActivity[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface StravaStatsProps {
+  stats: StravaStats;
+  activities: StravaActivity[];
+}
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [statsResponse, activitiesResponse] = await Promise.all([
-          fetch('/api/strava/stats'),
-          fetch('/api/strava/activities?limit=5'),
-        ]);
-
-        if (!statsResponse.ok || !activitiesResponse.ok) {
-          throw new Error('Failed to fetch Strava data');
-        }
-
-        const [statsData, activitiesData] = await Promise.all([
-          statsResponse.json(),
-          activitiesResponse.json(),
-        ]);
-
-        setStats(statsData);
-        setActivities(activitiesData);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'An error occurred');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="animate-pulse">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-gray-200 dark:bg-gray-700 h-40 rounded-lg" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
-        <p className="text-red-800 dark:text-red-200">
-          Failed to load Strava data: {error}
-        </p>
-      </div>
-    );
-  }
-
-  if (!stats) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-gray-600 dark:text-gray-400">
-          No Strava data available
-        </p>
-      </div>
-    );
-  }
+export default function StravaStats({ stats, activities }: StravaStatsProps) {
 
   return (
     <div className="space-y-8">
