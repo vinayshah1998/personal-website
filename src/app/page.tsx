@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { projects } from '@/lib/projects';
 
 export default function Home() {
-  // Get the latest 2 projects
-  const recentProjects = projects.slice(0, 2);
+  // Get the latest 3 projects
+  const recentProjects = projects.slice(0, 3);
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">

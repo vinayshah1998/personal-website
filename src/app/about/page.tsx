@@ -7,17 +7,19 @@ export default function About() {
       
       <div className="prose prose-gray dark:prose-invert max-w-none">
         <p className="text-lg text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
-          I'm a passionate software engineer.
-          I love creating solutions that are both functional and beautiful.
+          I'm a software engineer who loves building across the full stack — from iOS apps
+          to Chrome extensions to AI-powered agent systems.
         </p>
-        
+
         <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
           Background
         </h2>
         <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
-          My journey started [when/how you got started]. Over the years, I've worked on 
-          various projects ranging from [types of projects]. I'm particularly interested 
-          in [your specific interests/specializations].
+          I enjoy tackling problems across different platforms and technologies. I've built
+          privacy-focused iOS apps like LuckyNumber, explored AI integration with browser
+          extensions like LLM Time Blocker, and developed AI agent systems for autonomous
+          payment negotiation at hackathons. I'm particularly interested in finding ways to
+          integrate AI into everyday tools and workflows.
         </p>
         
         <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
@@ -29,10 +31,12 @@ export default function About() {
               Technical Skills
             </h3>
             <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-              <li>• Skill 1</li>
-              <li>• Skill 2</li>
-              <li>• Skill 3</li>
-              <li>• Skill 4</li>
+              <li>• Swift / SwiftUI</li>
+              <li>• TypeScript / JavaScript</li>
+              <li>• Python</li>
+              <li>• React / Next.js</li>
+              <li>• Node.js / Express</li>
+              <li>• PostgreSQL / Prisma</li>
             </ul>
           </div>
           <div>
@@ -40,10 +44,11 @@ export default function About() {
               Interests
             </h3>
             <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-              <li>• Building</li>
-              <li>• Baking</li>
+              <li>• Hiking & Mountaineering</li>
               <li>• Running</li>
-              <li>• Gaming</li>
+              <li>• Sports</li>
+              <li>• Baking Bread</li>
+              <li>• Video Games</li>
             </ul>
           </div>
         </div>
