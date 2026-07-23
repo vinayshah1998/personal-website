@@ -1,6 +1,5 @@
 interface StravaTokenResponse {
   access_token: string;
-  refresh_token: string;
   expires_at: number;
 }
 
@@ -13,118 +12,128 @@ interface StravaActivity {
   total_elevation_gain: number;
   type: string;
   start_date: string;
+  start_date_local?: string;
   average_speed?: number;
   max_speed?: number;
 }
 
+interface StravaTotals {
+  count: number;
+  distance: number;
+  moving_time: number;
+  elapsed_time: number;
+  elevation_gain: number;
+}
+
 interface StravaStats {
-  recent_run_totals: {
-    count: number;
-    distance: number;
-    moving_time: number;
-    elapsed_time: number;
-    elevation_gain: number;
-  };
-  ytd_run_totals: {
-    count: number;
-    distance: number;
-    moving_time: number;
-    elapsed_time: number;
-    elevation_gain: number;
-  };
-  all_run_totals: {
-    count: number;
-    distance: number;
-    moving_time: number;
-    elapsed_time: number;
-    elevation_gain: number;
-  };
+  recent_run_totals: StravaTotals;
+  ytd_run_totals: StravaTotals;
+  all_run_totals: StravaTotals;
+}
+
+interface StravaCredentials {
+  clientId: string;
+  clientSecret: string;
+  refreshToken: string;
+}
+
+export class StravaConfigurationError extends Error {
+  constructor() {
+    super('Strava is not configured');
+    this.name = 'StravaConfigurationError';
+  }
+}
+
+function getCredentials(): StravaCredentials {
+  const clientId = process.env.STRAVA_CLIENT_ID;
+  const clientSecret = process.env.STRAVA_CLIENT_SECRET;
+  const refreshToken = process.env.STRAVA_REFRESH_TOKEN;
+
+  if (!clientId || !clientSecret || !refreshToken) {
+    throw new StravaConfigurationError();
+  }
+
+  return { clientId, clientSecret, refreshToken };
+}
+
+export function isStravaConfigured() {
+  return Boolean(
+    process.env.STRAVA_CLIENT_ID &&
+      process.env.STRAVA_CLIENT_SECRET &&
+      process.env.STRAVA_REFRESH_TOKEN,
+  );
 }
 
 class StravaAPI {
-  private clientId: string;
-  private clientSecret: string;
-  private refreshToken: string;
   private accessToken: string | null = null;
-  private tokenExpiresAt: number = 0;
-
-  constructor() {
-    this.clientId = process.env.STRAVA_CLIENT_ID!;
-    this.clientSecret = process.env.STRAVA_CLIENT_SECRET!;
-    this.refreshToken = process.env.STRAVA_REFRESH_TOKEN!;
-
-    if (!this.clientId || !this.clientSecret || !this.refreshToken) {
-      throw new Error('Missing Strava API credentials');
-    }
-  }
+  private tokenExpiresAt = 0;
 
   private async refreshAccessToken(): Promise<string> {
     if (this.accessToken && Date.now() < this.tokenExpiresAt * 1000) {
       return this.accessToken;
     }
 
-    console.log('Refreshing Strava access token...');
-    
+    const credentials = getCredentials();
     const response = await fetch('https://www.strava.com/oauth/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        client_id: this.clientId,
-        client_secret: this.clientSecret,
-        refresh_token: this.refreshToken,
+        client_id: credentials.clientId,
+        client_secret: credentials.clientSecret,
+        refresh_token: credentials.refreshToken,
         grant_type: 'refresh_token',
       }),
+      cache: 'no-store',
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Token refresh failed:', response.status, errorText);
-      throw new Error(`Failed to refresh token: ${response.statusText} - ${errorText}`);
+      throw new Error(`Strava token refresh failed with status ${response.status}`);
     }
 
     const data: StravaTokenResponse = await response.json();
-    console.log('Token refreshed successfully');
-    
     this.accessToken = data.access_token;
     this.tokenExpiresAt = data.expires_at;
 
     return this.accessToken;
   }
 
-  private async makeRequest(endpoint: string) {
+  private async makeRequest<T>(endpoint: string): Promise<T> {
     const token = await this.refreshAccessToken();
-    
-    console.log(`Making request to: https://www.strava.com/api/v3${endpoint}`);
-    
     const response = await fetch(`https://www.strava.com/api/v3${endpoint}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      next: {
+        revalidate: 600,
+      },
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`API request failed: ${response.status} ${response.statusText}`, errorText);
-      throw new Error(`API request failed: ${response.statusText} - ${errorText}`);
+      throw new Error(`Strava API request failed with status ${response.status}`);
     }
 
-    return response.json();
+    return response.json() as Promise<T>;
   }
 
   async getAthleteStats(athleteId?: string): Promise<StravaStats> {
-    // If no athleteId provided, get current athlete first
-    if (!athleteId) {
-      const athlete = await this.makeRequest('/athlete');
-      athleteId = athlete.id;
+    let resolvedAthleteId = athleteId;
+
+    if (!resolvedAthleteId) {
+      const athlete = await this.makeRequest<{ id: number }>('/athlete');
+      resolvedAthleteId = String(athlete.id);
     }
 
-    return this.makeRequest(`/athletes/${athleteId}/stats`);
+    return this.makeRequest<StravaStats>(
+      `/athletes/${resolvedAthleteId}/stats`,
+    );
   }
 
   async getRecentActivities(limit = 10): Promise<StravaActivity[]> {
-    return this.makeRequest(`/athlete/activities?per_page=${limit}`);
+    return this.makeRequest<StravaActivity[]>(
+      `/athlete/activities?per_page=${limit}`,
+    );
   }
 }
 

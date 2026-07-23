@@ -1,38 +1,40 @@
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getAllPosts, getPostBySlug } from '@/lib/blog';
+import { ArrowLeft, Clock3 } from 'lucide-react';
+import { formatBlogDate, getAllPosts, getPostBySlug } from '@/lib/blog';
 import MarkdownContent from '@/components/MarkdownContent';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-export async function generateStaticParams() {
-  const posts = getAllPosts();
-  return posts.map((post) => ({
-    slug: post.slug,
-  }));
+export function generateStaticParams() {
+  return getAllPosts().map((post) => ({ slug: post.slug }));
 }
 
-export async function generateMetadata({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const post = getPostBySlug(slug);
 
   if (!post) {
-    return {
-      title: 'Post Not Found',
-    };
+    return { title: 'Post not found' };
   }
 
   return {
-    title: `${post.title} - Vinay Shah`,
+    title: post.title,
     description: post.excerpt,
+    alternates: {
+      canonical: `/blog/${post.slug}`,
+    },
     openGraph: {
-      title: post.title,
+      title: `${post.title} | Vinay Shah`,
       description: post.excerpt,
       type: 'article',
       publishedTime: post.date,
       tags: post.tags,
+      url: `/blog/${post.slug}`,
+      images: ['/opengraph-image'],
     },
   };
 }
@@ -45,54 +47,63 @@ export default async function BlogPostPage({ params }: PageProps) {
     notFound();
   }
 
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    datePublished: post.date,
+    description: post.excerpt,
+    author: {
+      '@type': 'Person',
+      name: 'Vinay Shah',
+      url: 'https://vinayshah.dev',
+    },
+    mainEntityOfPage: `https://vinayshah.dev/blog/${post.slug}`,
+  };
+
   return (
-    <article className="max-w-4xl mx-auto px-6 py-16">
-      <Link
-        href="/blog"
-        className="inline-block mb-8 text-blue-600 dark:text-blue-400 hover:underline"
-      >
-        ← Back to Blog
-      </Link>
-
-      <header className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
-
-        <div className="flex items-center gap-4 text-gray-600 dark:text-gray-400">
-          <time dateTime={post.date}>
-            {new Date(post.date).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </time>
-
-          {post.tags.length > 0 && (
-            <div className="flex gap-2">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <article className="article-layout">
+        <header className="article-header">
+          <div className="reading-shell">
+            <Link className="case-back" href="/blog">
+              <ArrowLeft size={16} aria-hidden="true" />
+              Writing
+            </Link>
+            <p className="page-kicker">{post.tags[0]}</p>
+            <h1 className="page-heading">{post.title}</h1>
+            <div className="post-meta article-meta">
+              <time dateTime={post.date}>{formatBlogDate(post.date)}</time>
+              <span>
+                <Clock3 size={14} aria-hidden="true" />
+                {post.readingTime} min read
+              </span>
+            </div>
+            <div className="tag-list" aria-label="Article tags">
               {post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm"
-                >
-                  {tag}
-                </span>
+                <span className="tag" key={tag}>{tag}</span>
               ))}
             </div>
-          )}
+          </div>
+        </header>
+
+        <div className="reading-shell article-body">
+          <MarkdownContent content={post.content} />
         </div>
-      </header>
 
-      <div className="border-t border-gray-200 dark:border-gray-800 pt-8">
-        <MarkdownContent content={post.content} />
-      </div>
-
-      <footer className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
-        <Link
-          href="/blog"
-          className="text-blue-600 dark:text-blue-400 hover:underline"
-        >
-          ← Back to Blog
-        </Link>
-      </footer>
-    </article>
+        <footer className="reading-shell article-footer">
+          <p className="eyebrow">More writing</p>
+          <h2 className="subheading">Return to the archive.</h2>
+          <Link className="text-link" href="/blog">
+            All writing
+            <ArrowLeft size={15} aria-hidden="true" />
+          </Link>
+        </footer>
+      </article>
+    </>
   );
 }

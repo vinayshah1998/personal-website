@@ -1,13 +1,26 @@
-const Footer = () => {
+export default function Footer() {
   return (
-    <footer className="mt-16 py-8 border-t border-gray-200 dark:border-gray-800">
-      <div className="max-w-2xl mx-auto px-6">
-        <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-          © {new Date().getFullYear()} Vinay Shah. All rights reserved.
-        </p>
+    <footer className="site-footer">
+      <div className="shell footer-inner">
+        <nav className="footer-links" aria-label="Social links">
+          <a
+            className="footer-link"
+            href="https://github.com/vinayshah1998"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub<span className="sr-only"> (opens in a new tab)</span>
+          </a>
+          <a
+            className="footer-link"
+            href="https://linkedin.com/in/vinay-s-shah"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            LinkedIn<span className="sr-only"> (opens in a new tab)</span>
+          </a>
+        </nav>
       </div>
     </footer>
-  )
+  );
 }
-
-export default Footer

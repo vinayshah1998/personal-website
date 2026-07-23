@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect } from 'react';
+import { RefreshCw } from 'lucide-react';
 
-export default function Error({
+export default function StatsError({
   error,
   reset,
 }: {
@@ -14,27 +15,21 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-16">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">
-          Running Stats
-        </h1>
-      </div>
-
-      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
-        <h2 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
-          Something went wrong
-        </h2>
-        <p className="text-red-700 dark:text-red-300 mb-4">
-          Failed to load Strava data. This might be a temporary issue.
-        </p>
-        <button
-          onClick={() => reset()}
-          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
-        >
-          Try again
-        </button>
-      </div>
+    <div className="shell page-section">
+      <section className="run-unavailable" aria-labelledby="stats-error-title">
+        <div>
+          <p className="eyebrow">Run log error</p>
+          <h1 id="stats-error-title" className="section-heading">The page missed a step.</h1>
+          <p>
+            The rest of the site is available. Retry the request, or come back
+            after the current sync window.
+          </p>
+          <button className="button button-primary" type="button" onClick={reset}>
+            <RefreshCw size={16} aria-hidden="true" />
+            Retry
+          </button>
+        </div>
+      </section>
     </div>
   );
 }

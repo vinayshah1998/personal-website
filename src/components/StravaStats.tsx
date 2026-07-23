@@ -1,134 +1,122 @@
-import type { StravaStats, StravaActivity } from '@/lib/strava';
+import type { StravaActivity, StravaStats } from '@/lib/strava';
+import RunTrendChart from '@/components/RunTrendChart';
 
 const METERS_TO_MILES = 0.000621371;
-
 const formatDistance = (meters: number) => (meters * METERS_TO_MILES).toFixed(1);
 
-interface StatsCardProps {
-  title: string;
+function formatTime(seconds: number) {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  return `${hours}h ${minutes}m`;
+}
+
+function formatDate(value: string) {
+  const [year, month, day] = value.slice(0, 10).split('-').map(Number);
+
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(year, month - 1, day)));
+}
+
+function PeriodSummary({
+  label,
+  count,
+  distance,
+  moving_time,
+  elevation_gain,
+}: {
+  label: string;
   count: number;
   distance: number;
-  time: number;
-  elevation: number;
+  moving_time: number;
+  elevation_gain: number;
+}) {
+  return (
+    <div className="run-period-row">
+      <p className="run-period-label">{label}</p>
+      <p className="run-period-distance">
+        {formatDistance(distance)}
+        <span> mi</span>
+      </p>
+      <p className="run-period-meta">
+        {count} runs <span aria-hidden="true">/</span> {formatTime(moving_time)}
+        <br />
+        {Math.round(elevation_gain).toLocaleString()} m elevation
+      </p>
+    </div>
+  );
 }
 
-const StatsCard = ({ title, count, distance, time, elevation }: StatsCardProps) => {
-  const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours}h ${minutes}m`;
-  };
-
-  return (
-    <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
-      <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
-        {title}
-      </h3>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-            {count}
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Activities</p>
-        </div>
-        <div>
-          <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-            {formatDistance(distance)} mi
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Distance</p>
-        </div>
-        <div>
-          <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-            {formatTime(time)}
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Time</p>
-        </div>
-        <div>
-          <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
-            {Math.round(elevation)} m
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Elevation</p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const RecentActivity = ({ activity }: { activity: StravaActivity }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
-  return (
-    <div className="flex justify-between items-center py-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
-      <div>
-        <h4 className="font-medium text-gray-900 dark:text-gray-100">
-          {activity.name}
-        </h4>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          {formatDate(activity.start_date)} • {activity.type}
-        </p>
-      </div>
-      <div className="text-right">
-        <p className="font-semibold text-gray-900 dark:text-gray-100">
-          {formatDistance(activity.distance)} mi
-        </p>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          {Math.round(activity.moving_time / 60)} min
-        </p>
-      </div>
-    </div>
-  );
-};
-
-interface StravaStatsProps {
+export default function StravaStatsView({
+  stats,
+  activities,
+}: {
   stats: StravaStats;
   activities: StravaActivity[];
-}
-
-export default function StravaStats({ stats, activities }: StravaStatsProps) {
+}) {
+  const recent = stats.recent_run_totals;
+  const focus = recent.count > 0 ? recent : stats.ytd_run_totals;
+  const focusLabel = recent.count > 0 ? 'Last four weeks' : 'Year to date';
 
   return (
-    <div className="space-y-8">
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <StatsCard
-          title="Last 4 Weeks"
-          count={stats.recent_run_totals.count}
-          distance={stats.recent_run_totals.distance}
-          time={stats.recent_run_totals.moving_time}
-          elevation={stats.recent_run_totals.elevation_gain}
-        />
-        <StatsCard
-          title="This Year"
-          count={stats.ytd_run_totals.count}
-          distance={stats.ytd_run_totals.distance}
-          time={stats.ytd_run_totals.moving_time}
-          elevation={stats.ytd_run_totals.elevation_gain}
-        />
-        <StatsCard
-          title="All Time"
-          count={stats.all_run_totals.count}
-          distance={stats.all_run_totals.distance}
-          time={stats.all_run_totals.moving_time}
-          elevation={stats.all_run_totals.elevation_gain}
-        />
-      </div>
-
-      {activities.length > 0 && (
-        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
-            Recent Activities
-          </h3>
-          <div className="space-y-0">
-            {activities.map((activity) => (
-              <RecentActivity key={activity.id} activity={activity} />
-            ))}
+    <div className="run-data">
+      <section className="run-overview" aria-labelledby="run-overview-title">
+        <div className="run-primary">
+          <p className="eyebrow">{focusLabel}</p>
+          <h2 id="run-overview-title">
+            {formatDistance(focus.distance)}
+            <span> miles</span>
+          </h2>
+          <div className="run-primary-meta">
+            <span><strong>{focus.count}</strong> runs</span>
+            <span><strong>{formatTime(focus.moving_time)}</strong> moving</span>
+            <span>
+              <strong>{Math.round(focus.elevation_gain).toLocaleString()} m</strong> elevation
+            </span>
           </div>
         </div>
-      )}
+
+        {activities.length > 0 && <RunTrendChart activities={activities} />}
+      </section>
+
+      <div className="run-detail-grid">
+        <section className="run-history" aria-labelledby="run-history-title">
+          <div className="run-section-heading">
+            <p className="eyebrow">Across time</p>
+            <h2 id="run-history-title" className="section-heading">Totals</h2>
+          </div>
+          <div className="run-periods">
+            <PeriodSummary label="Last 4 weeks" {...recent} />
+            <PeriodSummary label="This year" {...stats.ytd_run_totals} />
+            <PeriodSummary label="All time" {...stats.all_run_totals} />
+          </div>
+        </section>
+
+        {activities.length > 0 && (
+          <section className="activity-log" aria-labelledby="recent-activities-title">
+            <div className="run-section-heading">
+              <p className="eyebrow">Most recent</p>
+              <h2 id="recent-activities-title" className="section-heading">Activity</h2>
+            </div>
+            <ol>
+              {activities.slice(0, 5).map((activity) => (
+                <li key={activity.id}>
+                  <time dateTime={activity.start_date}>
+                    {formatDate(activity.start_date_local ?? activity.start_date)}
+                  </time>
+                  <div>
+                    <strong>{activity.name}</strong>
+                    <span>{Math.round(activity.moving_time / 60)} min</span>
+                  </div>
+                  <strong>{formatDistance(activity.distance)} mi</strong>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
+      </div>
     </div>
   );
 }

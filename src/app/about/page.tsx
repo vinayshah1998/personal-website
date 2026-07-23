@@ -1,91 +1,149 @@
-export default function About() {
-  return (
-    <div className="max-w-4xl mx-auto px-6 py-16">
-      <h1 className="text-4xl font-bold mb-8 text-gray-900 dark:text-gray-100">
-        About Me
-      </h1>
-      
-      <div className="prose prose-gray dark:prose-invert max-w-none">
-        <p className="text-lg text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
-          I'm a software engineer who loves building across the full stack — from iOS apps
-          to Chrome extensions to AI-powered agent systems.
-        </p>
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
 
-        <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-          Background
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
-          I enjoy tackling problems across different platforms and technologies. I've built
-          privacy-focused iOS apps like LuckyNumber, explored AI integration with browser
-          extensions like LLM Time Blocker, and developed AI agent systems for autonomous
-          payment negotiation at hackathons. I'm particularly interested in finding ways to
-          integrate AI into everyday tools and workflows.
-        </p>
-        
-        <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-          Skills & Interests
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+export const metadata: Metadata = {
+  title: 'About',
+  description:
+    'How Vinay Shah approaches product engineering, system constraints, and the work outside the editor.',
+  alternates: {
+    canonical: '/about',
+  },
+};
+
+const principles = [
+  {
+    title: 'Instrument before guessing.',
+    body:
+      'The fastest route through a confusing production failure is usually a better signal, not a stronger opinion. My debugging notes start with the evidence path.',
+  },
+  {
+    title: 'Make the product rule explicit.',
+    body:
+      'Whether it is a 30-minute access window or limited contacts permission, clear constraints make both the interface and the architecture easier to trust.',
+  },
+  {
+    title: 'Measure the before and after.',
+    body:
+      'LuckyNumber became meaningfully better when launch performance moved from a vague complaint to a measurable 3 seconds, then under 100ms.',
+  },
+];
+
+const capabilities = [
+  {
+    title: 'Product surfaces',
+    body: 'SwiftUI, React, Next.js, Chrome extensions, and the interaction details around state.',
+  },
+  {
+    title: 'Service systems',
+    body: 'TypeScript, Node.js, Express, Python, PostgreSQL, authentication, billing, and APIs.',
+  },
+  {
+    title: 'AI workflows',
+    body: 'Claude-backed product behavior, personal agents, tool boundaries, and observable decisions.',
+  },
+];
+
+export default function AboutPage() {
+  return (
+    <>
+      <header className="shell about-hero page-section">
+        <div className="about-hero-copy">
+          <p className="page-kicker">About</p>
+          <h1 className="page-heading">I like understanding the whole product.</h1>
+          <p className="lede">
+            I am a software engineer drawn to work where the quality of the
+            interface depends on understanding the system underneath it.
+          </p>
+        </div>
+      </header>
+
+      <section className="about-intro">
+        <div className="shell about-intro-grid">
+          <p className="eyebrow">Practice</p>
           <div>
-            <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">
-              Technical Skills
-            </h3>
-            <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-              <li>• Swift / SwiftUI</li>
-              <li>• TypeScript / JavaScript</li>
-              <li>• Python</li>
-              <li>• React / Next.js</li>
-              <li>• Node.js / Express</li>
-              <li>• PostgreSQL / Prisma</li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">
-              Interests
-            </h3>
-            <ul className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-              <li>• Hiking & Mountaineering</li>
-              <li>• Running</li>
-              <li>• Sports</li>
-              <li>• Baking Bread</li>
-              <li>• Video Games</li>
-            </ul>
+            <h2 className="section-heading">Different platforms, similar questions.</h2>
+            <p className="lede">
+              What behavior should change? What constraint actually matters?
+              What evidence will tell us the result is better? Those questions
+              have taken me from browser extensions to payment agents and iOS.
+            </p>
+            <Link className="text-link" href="/projects">
+              View selected work
+              <ArrowRight size={16} aria-hidden="true" />
+            </Link>
           </div>
         </div>
-        
-        <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
-          Get In Touch
-        </h2>
-        <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
-          I'm always interested in connecting with like-minded people. 
-          Feel free to reach out if you'd like to collaborate or just have a chat.
-        </p>
-        
-        <div className="mt-6 flex gap-4">
-          <a 
-            href="mailto:vinayshah2006@gmail.com" 
-            className="text-blue-600 dark:text-blue-400 hover:underline"
-          >
-            Email
+      </section>
+
+      <section className="shell about-principles page-section">
+        <div className="section-intro">
+          <div>
+            <p className="eyebrow">Principles</p>
+            <h2 className="section-heading">How I approach ambiguous work.</h2>
+          </div>
+        </div>
+        <div className="principle-list">
+          {principles.map((principle) => (
+            <article key={principle.title}>
+              <h3 className="subheading">{principle.title}</h3>
+              <p>{principle.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="capability-band">
+        <div className="shell">
+          <p className="eyebrow">What I work with</p>
+          <div className="capability-grid">
+            {capabilities.map((capability) => (
+              <article key={capability.title}>
+                <h2 className="subheading">{capability.title}</h2>
+                <p>{capability.body}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="shell about-contact page-section">
+        <div>
+          <p className="eyebrow">Outside work</p>
+          <h2 className="section-heading">Running, climbing, and baking keep me honest.</h2>
+          <p className="lede">
+            I like pursuits with clear feedback and no convincing shortcut.
+            I am always glad to compare notes on software, products, or a good
+            route into the mountains.
+          </p>
+        </div>
+        <div className="about-contact-links">
+          <a className="text-link" href="mailto:vinayshah2006@gmail.com">
+            Email me
+            <ArrowUpRight size={15} aria-hidden="true" />
           </a>
-          <a 
-            href="https://github.com/vinayshah1998" 
-            className="text-blue-600 dark:text-blue-400 hover:underline"
-            target="_blank" 
+          <a
+            className="text-link"
+            href="https://github.com/vinayshah1998"
+            target="_blank"
             rel="noopener noreferrer"
           >
             GitHub
+            <ArrowUpRight size={15} aria-hidden="true" />
+            <span className="sr-only">(opens in a new tab)</span>
           </a>
-          <a 
-            href="https://linkedin.com/in/vinay-s-shah" 
-            className="text-blue-600 dark:text-blue-400 hover:underline"
-            target="_blank" 
+          <a
+            className="text-link"
+            href="https://linkedin.com/in/vinay-s-shah"
+            target="_blank"
             rel="noopener noreferrer"
           >
             LinkedIn
+            <ArrowUpRight size={15} aria-hidden="true" />
+            <span className="sr-only">(opens in a new tab)</span>
           </a>
         </div>
-      </div>
-    </div>
-  )
+      </section>
+    </>
+  );
 }

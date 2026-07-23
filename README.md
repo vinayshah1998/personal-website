@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# vinayshah.dev
 
-## Getting Started
+Vinay Shah's personal portfolio, project case studies, engineering notes, and
+running log. The site is built with Next.js, TypeScript, and Tailwind CSS.
 
-First, run the development server:
+## Requirements
+
+- Node.js 22 (`nvm use` reads `.nvmrc`)
+- npm
+
+Node 25 is not supported by the current Next.js release because its experimental
+Web Storage global conflicts with Next.js server rendering.
+
+## Local development
 
 ```bash
+nvm use
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The site works without external credentials. The `/stats` route shows a stable
+local-preview state when Strava is not configured.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Optional Strava data
 
-## Learn More
+Create `.env.local` from `.env.example` and provide:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+STRAVA_CLIENT_ID=
+STRAVA_CLIENT_SECRET=
+STRAVA_REFRESH_TOKEN=
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Never commit real credentials.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Validation
 
-## Deploy on Vercel
+```bash
+npm run lint
+npm run typecheck
+npm run build
+npm run verify:design
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+`verify:design` uses the locally installed Google Chrome to validate all public
+routes, narrow and wide viewport geometry, keyboard focus, the mobile menu, and
+key content invariants. Screenshots and its JSON report are written to
+`.artifacts/design`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Dependency audit
+
+The project is on the patched Next.js 15.5 line. `npm audit` currently reports
+advisories in Next's pinned `postcss` and optional `sharp` dependencies. This
+site does not accept untrusted CSS and disables Next image optimization, so
+those vulnerable paths are not exposed here. npm's proposed automated fix is an
+unsafe downgrade to Next 9 and must not be applied.
+
+## Content
+
+- Project data: `src/lib/projects.ts`
+- Blog posts: `src/app/blog/posts`
+- Public routes and metadata: `src/app`

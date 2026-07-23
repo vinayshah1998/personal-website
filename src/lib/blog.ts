@@ -9,6 +9,7 @@ export interface BlogPost {
   tags: string[];
   excerpt: string;
   content: string;
+  readingTime: number;
 }
 
 const postsDirectory = path.join(process.cwd(), 'src/app/blog/posts');
@@ -24,10 +25,8 @@ export function getAllPosts(): BlogPost[] {
     })
     .filter((post): post is BlogPost => post !== null);
 
-  // Sort posts by date (newest first)
-  return allPosts.sort((a, b) => {
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
-  });
+  // ISO calendar dates sort correctly without introducing timezone shifts.
+  return allPosts.sort((a, b) => b.date.localeCompare(a.date));
 }
 
 export function getPostBySlug(slug: string): BlogPost | null {
@@ -35,9 +34,12 @@ export function getPostBySlug(slug: string): BlogPost | null {
     const fullPath = path.join(postsDirectory, `${slug}.md`);
     const fileContents = fs.readFileSync(fullPath, 'utf8');
     const { data, content } = matter(fileContents);
+    const normalizedContent = content.replace(/^\s*#\s+[^\r\n]+\r?\n+/, '');
 
     // Extract excerpt (first 200 characters of content)
-    const excerpt = content.slice(0, 200).replace(/[#*`]/g, '').trim() + '...';
+    const excerpt =
+      normalizedContent.slice(0, 200).replace(/[#*`]/g, '').trim() + '...';
+    const wordCount = normalizedContent.trim().split(/\s+/).length;
 
     return {
       slug,
@@ -45,11 +47,27 @@ export function getPostBySlug(slug: string): BlogPost | null {
       date: data.date || '',
       tags: data.tags || [],
       excerpt: data.excerpt || excerpt,
-      content,
+      content: normalizedContent,
+      readingTime: Math.max(1, Math.ceil(wordCount / 220)),
     };
   } catch {
     return null;
   }
+}
+
+export function formatBlogDate(date: string) {
+  const [year, month, day] = date.split('-').map(Number);
+
+  if (!year || !month || !day) {
+    return date;
+  }
+
+  return new Intl.DateTimeFormat('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(year, month - 1, day)));
 }
 
 export function getAllTags(): string[] {

@@ -1,75 +1,62 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { getAllPosts } from '@/lib/blog';
+import { ArrowRight } from 'lucide-react';
+import { formatBlogDate, getAllPosts } from '@/lib/blog';
 
-export const metadata = {
-  title: 'Blog - Vinay Shah',
-  description: 'Technical writing, project retrospectives, and thoughts on software engineering.',
+export const metadata: Metadata = {
+  title: 'Engineering notes',
+  description:
+    'Debugging stories, infrastructure field notes, and practical lessons from building software.',
+  alternates: {
+    canonical: '/blog',
+  },
 };
 
 export default function BlogPage() {
   const posts = getAllPosts();
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-16">
-      <h1 className="text-4xl font-bold mb-8">Blog</h1>
-
-      {posts.length === 0 ? (
-        <p className="text-gray-600 dark:text-gray-400">
-          No blog posts yet. Check back soon!
+    <>
+      <header className="shell writing-header page-section">
+        <p className="page-kicker">Writing</p>
+        <h1 className="page-heading">Notes from building and debugging.</h1>
+        <p className="lede">
+          Practical accounts of production failures, infrastructure, and
+          product experiments.
         </p>
-      ) : (
-        <div className="space-y-8">
+      </header>
+
+      <section className="shell writing-list page-section" aria-label="All engineering notes">
+        <div className="section-intro">
+          <div>
+            <p className="eyebrow">Archive</p>
+            <h2 className="section-heading">All notes</h2>
+          </div>
+        </div>
+        <div className="post-index">
           {posts.map((post) => (
-            <article
-              key={post.slug}
-              className="border-b border-gray-200 dark:border-gray-800 pb-8 last:border-0"
-            >
-              <Link
-                href={`/blog/${post.slug}`}
-                className="group"
-              >
-                <h2 className="text-2xl font-bold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                  {post.title}
-                </h2>
-              </Link>
-
-              <div className="flex items-center gap-4 mb-3 text-sm text-gray-600 dark:text-gray-400">
-                <time dateTime={post.date}>
-                  {new Date(post.date).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
-                </time>
-
-                {post.tags.length > 0 && (
-                  <div className="flex gap-2">
-                    {post.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
+            <article key={post.slug}>
+              <div className="post-index-date">
+                <time dateTime={post.date}>{formatBlogDate(post.date)}</time>
               </div>
-
-              <p className="text-gray-700 dark:text-gray-300 mb-4">
-                {post.excerpt}
-              </p>
-
+              <div className="post-index-copy">
+                <h3 className="subheading">
+                  <Link href={`/blog/${post.slug}`}>{post.title}</Link>
+                </h3>
+                <p>{post.excerpt}</p>
+                <span>{post.readingTime} min read</span>
+              </div>
               <Link
+                className="post-index-action"
                 href={`/blog/${post.slug}`}
-                className="text-blue-600 dark:text-blue-400 hover:underline"
+                aria-label={`Read ${post.title}`}
               >
-                Read more →
+                <ArrowRight size={20} aria-hidden="true" />
               </Link>
             </article>
           ))}
         </div>
-      )}
-    </div>
+      </section>
+    </>
   );
 }

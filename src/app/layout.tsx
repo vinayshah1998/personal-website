@@ -1,36 +1,71 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import Link from "next/link";
-import "./globals.css";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import { Analytics } from "@vercel/analytics/next";
+import type { Metadata } from 'next';
+import { Instrument_Sans, Newsreader } from 'next/font/google';
+import Link from 'next/link';
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import Navigation from '@/components/Navigation';
+import Footer from '@/components/Footer';
+import './globals.css';
+import './editorial.css';
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
+const sansFont = Instrument_Sans({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+});
+
+const serifFont = Newsreader({
+  subsets: ['latin'],
+  weight: ['400', '500'],
+  style: ['normal', 'italic'],
+  variable: '--font-serif',
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: "Vinay Shah's Website",
-  description: "Personal website and portfolio",
-  keywords: ["developer", "portfolio", "projects", "web development"],
-  authors: [{ name: "Vinay Shah" }],
-  creator: "Vinay Shah",
+  metadataBase: new URL('https://vinayshah.dev'),
+  title: {
+    default: 'Vinay Shah | Product-minded software engineer',
+    template: '%s | Vinay Shah',
+  },
+  description:
+    'Vinay Shah builds practical AI systems, mobile tools, and reliable product infrastructure.',
+  keywords: [
+    'Vinay Shah',
+    'software engineer',
+    'AI agents',
+    'iOS',
+    'TypeScript',
+    'product engineering',
+  ],
+  authors: [{ name: 'Vinay Shah', url: 'https://vinayshah.dev' }],
+  creator: 'Vinay Shah',
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://vinayshah.dev",
-    title: "Vinay Shah - Personal Website",
-    description: "Personal website and portfolio",
-    siteName: "Vinay Shah",
+    type: 'website',
+    locale: 'en_US',
+    url: '/',
+    title: 'Vinay Shah | Product-minded software engineer',
+    description:
+      'Practical AI systems, mobile tools, and reliable product infrastructure.',
+    siteName: 'Vinay Shah',
+    images: [
+      {
+        url: '/opengraph-image',
+        width: 1200,
+        height: 630,
+        alt: 'Vinay Shah - product-minded software engineer',
+      },
+    ],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Vinay Shah - Personal Website",
-    description: "Personal website and portfolio",
-    creator: "@vinayshah1998",
+    card: 'summary_large_image',
+    title: 'Vinay Shah | Product-minded software engineer',
+    description:
+      'Practical AI systems, mobile tools, and reliable product infrastructure.',
+    images: ['/opengraph-image'],
   },
 };
 
@@ -40,27 +75,31 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.className}>
-      <body className="antialiased bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
-        <div className="min-h-screen flex flex-col">
-          <header className="py-6 border-b border-gray-200 dark:border-gray-800">
-            <div className="max-w-4xl mx-auto px-6 flex justify-between items-center">
-              <Link href="/">
-                <h1 className="text-lg font-semibold whitespace-nowrap hover:text-gray-600 dark:hover:text-gray-400 transition-colors cursor-pointer">
-                  Vinay Shah
-                </h1>
+    <html
+      lang="en"
+      className={`${sansFont.variable} ${serifFont.variable}`}
+    >
+      <body>
+        <a className="skip-link" href="#main-content">
+          Skip to content
+        </a>
+        <div className="site-frame">
+          <header className="site-header">
+            <div className="shell site-header-inner">
+              <Link href="/" className="site-brand" aria-label="Vinay Shah, home">
+                <span className="site-brand-name">Vinay Shah</span>
               </Link>
               <Navigation />
             </div>
           </header>
-          <main className="flex-1">
+          <main id="main-content" className="site-main">
             {children}
           </main>
           <Footer />
         </div>
         <Analytics />
+        <SpeedInsights />
       </body>
-      <SpeedInsights />
     </html>
   );
 }
