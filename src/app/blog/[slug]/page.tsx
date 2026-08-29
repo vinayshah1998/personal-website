@@ -46,10 +46,10 @@ export default async function BlogPostPage({ params }: PageProps) {
   }
 
   return (
-    <article className="max-w-4xl mx-auto px-6 py-16">
+    <article className="panel panel-strong max-w-4xl mx-auto my-10 px-6 py-12 md:px-10">
       <Link
         href="/blog"
-        className="inline-block mb-8 text-blue-600 dark:text-blue-400 hover:underline"
+        className="inline-block mb-8 text-blue-300 hover:underline"
       >
         ← Back to Blog
       </Link>
@@ -57,7 +57,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       <header className="mb-8">
         <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
 
-        <div className="flex items-center gap-4 text-gray-600 dark:text-gray-400">
+        <div className="flex items-center gap-4 text-white/60">
           <time dateTime={post.date}>
             {new Date(post.date).toLocaleDateString('en-US', {
               year: 'numeric',
@@ -71,7 +71,7 @@ export default async function BlogPostPage({ params }: PageProps) {
               {post.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm"
+                  className="px-2 py-1 bg-white/10 rounded text-sm"
                 >
                   {tag}
                 </span>
@@ -81,14 +81,14 @@ export default async function BlogPostPage({ params }: PageProps) {
         </div>
       </header>
 
-      <div className="border-t border-gray-200 dark:border-gray-800 pt-8">
+      <div className="border-t border-white/10 pt-8">
         <MarkdownContent content={post.content} />
       </div>
 
-      <footer className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
+      <footer className="mt-12 pt-8 border-t border-white/10">
         <Link
           href="/blog"
-          className="text-blue-600 dark:text-blue-400 hover:underline"
+          className="text-blue-300 hover:underline"
         >
           ← Back to Blog
         </Link>

@@ -21,12 +21,12 @@ export default async function StatsPage() {
   const data = await getStravaData();
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-16">
+    <div className="panel panel-strong max-w-4xl mx-auto my-10 px-6 py-12 md:px-10">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+        <h1 className="text-4xl font-bold mb-4 text-white">
           Running Stats
         </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-400">
+        <p className="text-lg text-white/60">
           My running journey tracked through Strava. Here's how I've been staying active.
         </p>
       </div>
@@ -34,7 +34,7 @@ export default async function StatsPage() {
       {data ? (
         <StravaStats stats={data.stats} activities={data.activities} />
       ) : (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+        <div className="bg-red-500/10 border border-red-400/25 rounded-lg p-4">
           <p className="text-red-800 dark:text-red-200">
             Failed to load Strava data. Please try again later.
           </p>

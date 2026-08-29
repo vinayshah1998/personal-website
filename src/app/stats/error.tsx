@@ -14,14 +14,14 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-16">
+    <div className="panel panel-strong max-w-4xl mx-auto my-10 px-6 py-12 md:px-10">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+        <h1 className="text-4xl font-bold mb-4 text-white">
           Running Stats
         </h1>
       </div>
 
-      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
+      <div className="bg-red-500/10 border border-red-400/25 rounded-lg p-6">
         <h2 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
           Something went wrong
         </h2>

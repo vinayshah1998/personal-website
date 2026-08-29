@@ -1,27 +1,92 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/* The site is a single dark scene, so `dark:` utilities always apply rather
+   than following the OS preference. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #04060d;
+  --foreground: #e8ecf5;
+  --muted: #9aa7bd;
+  --accent: #8ab8ff;
+  color-scheme: dark;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 
 body {
-  background: var(--background);
+  /* Transparent so the WebGPU scene behind the content shows through. */
+  background: transparent;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Frosted card that keeps body copy readable over the brightest planets. */
+.panel {
+  background: color-mix(in srgb, #070b16 62%, transparent);
+  border: 1px solid rgb(255 255 255 / 0.08);
+  border-radius: 1rem;
+  backdrop-filter: blur(14px) saturate(120%);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+}
+
+.panel-soft {
+  background: rgb(255 255 255 / 0.04);
+  border: 1px solid rgb(255 255 255 / 0.07);
+  border-radius: 0.75rem;
+}
+
+/* Long text sits on a slightly stronger ground than decorative panels. */
+.panel-strong {
+  background: color-mix(in srgb, #070b16 82%, transparent);
+}
+
+/* Shown only where WebGPU is unavailable. */
+.starfield-fallback {
+  background:
+    radial-gradient(1.5px 1.5px at 20% 30%, rgb(255 255 255 / 0.9), transparent),
+    radial-gradient(1.5px 1.5px at 75% 18%, rgb(255 255 255 / 0.7), transparent),
+    radial-gradient(1.5px 1.5px at 42% 72%, rgb(255 255 255 / 0.8), transparent),
+    radial-gradient(1.5px 1.5px at 88% 62%, rgb(255 255 255 / 0.6), transparent),
+    radial-gradient(1.5px 1.5px at 12% 84%, rgb(255 255 255 / 0.7), transparent),
+    radial-gradient(2px 2px at 60% 44%, rgb(255 255 255 / 0.5), transparent),
+    radial-gradient(circle at 72% 38%, rgb(58 96 168 / 0.45), transparent 55%),
+    radial-gradient(circle at 24% 68%, rgb(96 52 132 / 0.3), transparent 60%),
+    #04060d;
+}
+
+::selection {
+  background: rgb(138 184 255 / 0.3);
+}
+
+/* A scrollbar that belongs to the scene rather than the OS. */
+* {
+  scrollbar-color: rgb(255 255 255 / 0.18) transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.16);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(255 255 255 / 0.28);
 }
