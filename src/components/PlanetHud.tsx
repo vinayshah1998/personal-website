@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import { planetForPath } from '@/lib/solar-system';
+import { useChromeHidden } from './SolarSystemContext';
 
 /**
  * Small readout naming the planet the current route corresponds to — the thing
@@ -10,9 +11,15 @@ import { planetForPath } from '@/lib/solar-system';
 export default function PlanetHud() {
   const pathname = usePathname();
   const planet = planetForPath(pathname ?? '/');
+  const hidden = useChromeHidden();
 
   return (
-    <div className="pointer-events-none fixed bottom-5 left-5 z-20 hidden select-none sm:block">
+    <div
+      aria-hidden={hidden}
+      className={`pointer-events-none fixed bottom-5 left-5 z-20 hidden select-none transition-opacity duration-500 sm:block ${
+        hidden ? 'opacity-0' : 'opacity-100'
+      }`}
+    >
       <div key={planet.id} className="animate-[hud_600ms_ease-out]">
         <div className="flex items-center gap-2 text-[0.65rem] uppercase tracking-[0.22em] text-white/40">
           <span className="inline-block h-1.5 w-1.5 rounded-full bg-white/60" />

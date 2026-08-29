@@ -40,28 +40,51 @@ This is a Next.js 15 personal website using the App Router architecture with the
 #### Solar System Backdrop (WebGPU)
 
 The site is themed as a solar system: each section is a planet, and navigating
-between sections flies between them.
+between sections flies between them. There are two views of the same scene.
+
+**Section view** — the current route's planet alone at the origin, lit by an
+art-directed directional sun, camera parked on +z. This is the page backdrop.
+
+**Orrery view** — the sun plus every planet at its orbital position, lit from
+the sun, with a free orbit camera the visitor drives (drag to rotate,
+shift-drag to pan, wheel/pinch to zoom, click a planet to travel to its
+section). Entered from the "Solar system" button; the site's chrome can be
+toggled back on over it, or dismissed with Escape.
+
+The two differ only in uniforms, so moving between them is a change of values
+rather than a change of scene.
 
 - **Shader** (`src/shaders/planet.wgsl`): one fullscreen fragment pass drawing
-  starfield, nebula, an analytically ray-traced planet, cloud deck, atmosphere,
-  optional rings and an optional moon. Imports fBM/hash/colour helpers from
-  `@vgpu/wgsl-std` — the WGSL import graph is resolved at build time by the
-  loader wired up in `next.config.ts`.
-- **Planet data** (`src/lib/solar-system.ts`): a `PlanetLook` per route
-  (Earth `/`, Mars `/about`, Jupiter `/projects`, Neptune `/blog`,
-  Saturn `/stats`, Venus `/foolish-enterprises`). `planetForPath()` maps a
-  route to a planet; `lerpLook()` blends two of them.
-- **Uniform mapping** (`src/lib/planet-uniforms.ts`): flattens a look plus
-  per-frame state into the exact field names of the WGSL `Params` struct.
-- **Renderer** (`src/lib/planet-renderer.ts`): owns the WebGPU lifecycle and the
-  route-transition state machine. `vgpu` is dynamically imported so it stays out
-  of the initial bundle.
-- **Component** (`src/components/SolarSystem.tsx`): fixed full-viewport canvas.
-  Falls back to a static CSS starfield when WebGPU is unavailable or the device
-  is lost.
+  starfield, nebula, up to `MAX_BODIES` analytically intersected spheres with
+  their cloud decks, atmospheres, ring systems and moons, plus orbit lines and
+  the sun. Imports fBM/hash/colour helpers from `@vgpu/wgsl-std` — the WGSL
+  import graph is resolved at build time by the loader wired up in
+  `next.config.ts`.
+- **Planet data** (`src/lib/solar-system.ts`): a `PlanetLook` and an `OrbitSpec`
+  per route (Earth `/`, Mars `/about`, Jupiter `/projects`, Neptune `/blog`,
+  Saturn `/stats`, Venus `/foolish-enterprises`), plus `sun`. `planetForPath()`
+  maps a route to a planet; `lerpLook()` blends two of them.
+- **Uniform mapping** (`src/lib/planet-uniforms.ts`): builds the WGSL `Body`
+  array and `Params` struct, and owns the screen maths — `projectBody`,
+  `rayThroughUv`, `pickPlanetAlongRay` — which **must** stay in step with
+  planet.wgsl or labels drift off their planets and clicks pick the wrong one.
+- **Renderer** (`src/lib/planet-renderer.ts`): owns the WebGPU lifecycle, the
+  orrery camera, pointer input, and the transition state machine. `vgpu` is
+  dynamically imported so it stays out of the initial bundle.
+- **Components**: `SolarSystem.tsx` (canvas, planet labels, orrery controls),
+  `SolarSystemContext.tsx` (view state), `SiteChrome.tsx` (hides the page while
+  the orrery is up). Falls back to a static CSS starfield when WebGPU is
+  unavailable or the device is lost.
 
 Because every planet is the same shader with different uniforms, a route change
-interpolates between two looks — the planet morphs while the stars streak.
+interpolates between two looks — the planet morphs while the stars streak. View
+changes reuse the same warp, flipping the scene at the midpoint where the
+streaking is brightest.
+
+Planet labels are real `<button>` elements positioned imperatively from the
+renderer's per-frame projection callback, so the orrery is keyboard-navigable
+and no React state updates at 60fps. A label hides whenever its planet is
+occluded, decided by the same pick used for clicks.
 
 ##### Shader workflow
 
@@ -69,8 +92,15 @@ interpolates between two looks — the planet morphs while the stars streak.
 
 ```
 npm run shader:check     # validates against a real WebGPU device
-npm run shader:preview   # renders each planet to tools/preview-out/*.png
+npm run shader:preview   # renders every planet and the orrery to tools/preview-out/
+npm run shader:verify    # asserts label projection and click-picking match the shader
 ```
+
+`shader:verify` renders each planet twice — once highlighted — and diffs, which
+isolates that planet's pixels no matter what else is on screen. The centroid of
+the diff is where the shader actually drew it, which is compared against where
+`projectBody` says the label belongs. This is the only way to catch screen-maths
+drift; it is invisible in a screenshot.
 
 Headless rendering needs a GPU or `npx vgpu install-software-renderer`.
 Use `npx vgpu docs cat getting-started.md` for the API. Note that

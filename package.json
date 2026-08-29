@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "shader:check": "vgpu check src/shaders/planet.wgsl --require-validation",
-    "shader:preview": "tsx tools/preview.mts"
+    "shader:preview": "tsx tools/preview.mts",
+    "shader:verify": "tsx tools/verify-orrery.mts"
   },
   "dependencies": {
     "@tailwindcss/typography": "^0.5.19",

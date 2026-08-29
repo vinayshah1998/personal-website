@@ -24,8 +24,24 @@ const rgba = (hex: string, a = 1): Vec4 => {
   return [r, g, b, a];
 };
 
+/** Which of the two camera setups the backdrop is showing. */
+export type ViewMode = 'section' | 'orrery';
+
 export type Vec2 = [number, number];
+export type Vec3 = [number, number, number];
 export type Vec4 = [number, number, number, number];
+
+/** Where a body sits in the orrery. Distances are compressed for legibility. */
+export interface OrbitSpec {
+  /** Distance from the sun, in scene units. */
+  radius: number;
+  /** Starting angle in the ecliptic plane, radians. */
+  angle: number;
+  /** Radians per second. Inner planets move faster, as they should. */
+  speed: number;
+  /** Sphere radius in the orrery. */
+  size: number;
+}
 
 /** The interpolatable half of the shader's `Params` struct. */
 export interface PlanetLook {
@@ -81,6 +97,7 @@ export interface PlanetLook {
 
 export interface Planet {
   id: string;
+  orbit: OrbitSpec;
   /** Route this planet belongs to. */
   path: string;
   /** Display name, shown in the navigator. */
@@ -147,6 +164,7 @@ const look = (over: Partial<PlanetLook>): PlanetLook => ({ ...base, ...over });
 export const planets: Planet[] = [
   {
     id: 'earth',
+    orbit: { radius: 5.0, angle: 0.55, speed: 0.022, size: 0.55 },
     path: '/',
     name: 'Earth',
     tagline: 'Home — where the bread gets baked.',
@@ -169,6 +187,7 @@ export const planets: Planet[] = [
   },
   {
     id: 'mars',
+    orbit: { radius: 6.6, angle: 4.10, speed: 0.017, size: 0.42 },
     path: '/about',
     name: 'Mars',
     tagline: 'About — thin air, long horizons.',
@@ -195,6 +214,7 @@ export const planets: Planet[] = [
   },
   {
     id: 'jupiter',
+    orbit: { radius: 9.4, angle: 1.70, speed: 0.010, size: 1.10 },
     path: '/projects',
     name: 'Jupiter',
     tagline: 'Projects — the big ones, still spinning.',
@@ -222,6 +242,7 @@ export const planets: Planet[] = [
   },
   {
     id: 'neptune',
+    orbit: { radius: 15.8, angle: 3.30, speed: 0.005, size: 0.74 },
     path: '/blog',
     name: 'Neptune',
     tagline: 'Writing — slow, cold, and very far out.',
@@ -247,6 +268,7 @@ export const planets: Planet[] = [
   },
   {
     id: 'saturn',
+    orbit: { radius: 12.6, angle: 5.20, speed: 0.0075, size: 0.95 },
     path: '/stats',
     name: 'Saturn',
     tagline: 'Stats — rings, laps, and other loops.',
@@ -275,6 +297,7 @@ export const planets: Planet[] = [
   },
   {
     id: 'venus',
+    orbit: { radius: 3.6, angle: 2.35, speed: 0.030, size: 0.50 },
     path: '/foolish-enterprises',
     name: 'Venus',
     tagline: 'Foolish Enterprises — beautiful, and slightly toxic.',
@@ -300,7 +323,34 @@ export const planets: Planet[] = [
   },
 ];
 
+/**
+ * The sun. It reuses `PlanetLook` so it can sit in the same body array, but
+ * `emissive` in the uniform mapping makes the shader treat it as a light
+ * source rather than a lit surface.
+ */
+export const sun = {
+  id: 'sun',
+  name: 'Sol',
+  radius: 1.5,
+  look: look({
+    colorLow: rgba('#ffb347'),
+    colorMid: rgba('#fff0c4'),
+    colorHigh: rgba('#fff8e6'),
+    colorAtmo: [...linear('#ffcc7a'), 0.0] as Vec4,
+    noiseScale: [3.0, 3.0, 3.0, 0],
+    seed: 3.3,
+    cloudAmount: 0,
+    moonSize: 0,
+  }),
+};
+
 export const defaultPlanet = planets[0];
+
+/** Position of a planet in the ecliptic plane at a given time. */
+export function orbitPosition(orbit: OrbitSpec, time: number): Vec3 {
+  const a = orbit.angle + orbit.speed * time;
+  return [Math.cos(a) * orbit.radius, 0, Math.sin(a) * orbit.radius];
+}
 
 /** Longest matching route wins, so `/blog/some-post` still resolves to Neptune. */
 export function planetForPath(pathname: string): Planet {
