@@ -12,6 +12,14 @@
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
+
+# local audit and verification artifacts
+/.audit/
+
+# blender backups
+*.blend1
 
 # next.js
 /.next/
