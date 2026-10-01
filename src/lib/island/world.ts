@@ -73,7 +73,12 @@ export const LAYOUT = {
     { center: [-3.4, 2.4], radius: 0.35 },
     { center: [-4.2, -2.0], radius: 0.3 },
   ] as readonly Circle[],
+  campfire: { center: [0.1, 5.6] as Vec2, radius: 0.5 },
+  logSeat: { center: [-0.85, 6.25] as Vec2, radius: 0.38 },
+  sign: { center: [-0.5, 3.5] as Vec2, radius: 0.32 },
 } as const;
+
+export const OBSTACLES: readonly Circle[] = [...LAYOUT.trees, ...LAYOUT.rocks, LAYOUT.campfire, LAYOUT.logSeat, LAYOUT.sign];
 
 export const TUNING = {
   walkSpeed: 2.4,
@@ -119,7 +124,7 @@ export function onDock(point: Vec2): boolean {
 export function isWalkable(point: Vec2): boolean {
   if (Math.hypot(point[0], point[1]) > LAYOUT.walkRadius) return false;
   if (inPond(point, LAYOUT.pond.margin) && !onDock(point)) return false;
-  for (const obstacle of [...LAYOUT.trees, ...LAYOUT.rocks]) {
+  for (const obstacle of OBSTACLES) {
     const distance = Math.hypot(point[0] - obstacle.center[0], point[1] - obstacle.center[1]);
     if (distance < obstacle.radius + LAYOUT.playerRadius) return false;
   }

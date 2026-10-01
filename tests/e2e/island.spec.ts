@@ -1,4 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
+import { LINES } from '../../src/lib/island/dialogue';
 
 const shots = process.env.ISLAND_SHOTS ?? '.audit/screens';
 
@@ -46,7 +47,7 @@ async function settledPosition(page: Page, world: Locator): Promise<[number, num
   return last;
 }
 
-async function landmark(world: Locator, name: 'pond' | 'meadow'): Promise<{ x: number; y: number }> {
+async function landmark(world: Locator, name: 'pond' | 'meadow' | 'sign' | 'campfire' | 'penguin'): Promise<{ x: number; y: number }> {
   return { x: Number(await world.getAttribute(`data-${name}-x`)), y: Number(await world.getAttribute(`data-${name}-y`)) };
 }
 
@@ -222,6 +223,52 @@ for (const away of ['window blur', 'hidden tab'] as const) {
   });
 }
 
+test('the penguin greets you, loves pats, and the sign and campfire answer back', async ({ page, isMobile }, testInfo) => {
+  const errors = trackErrors(page);
+  await page.addInitScript(() => {
+    const Base = window.AudioContext;
+    (window as unknown as { __contexts: number }).__contexts = 0;
+    window.AudioContext = class extends Base {
+      constructor(options?: AudioContextOptions) {
+        super(options);
+        (window as unknown as { __contexts: number }).__contexts++;
+      }
+    };
+  });
+  const world = await openIsland(page);
+  const bubble = page.getByTestId('island-bubble');
+  await expect(bubble).toBeVisible({ timeout: 5_000 });
+
+  await tapWorld(page, world, await landmark(world, 'penguin'), isMobile);
+  await expect(world).toHaveAttribute('data-interaction', /^pat:/);
+  await expect.poll(async () => LINES.pat.includes((await bubble.locator('.sr-only').textContent()) ?? '')).toBe(true);
+  expect(await position(world)).toEqual([-1.6, 2.4]);
+  await page.waitForTimeout(250);
+  await page.screenshot({ path: `${shots}/${testInfo.project.name}-pat.png` });
+
+  await tapWorld(page, world, await landmark(world, 'sign'), isMobile);
+  await expect(bubble.locator('.sr-only')).toContainText('Population: one penguin');
+
+  await tapWorld(page, world, await landmark(world, 'campfire'), isMobile);
+  await expect(world).toHaveAttribute('data-interaction', /^fire:/);
+  await page.screenshot({ path: `${shots}/${testInfo.project.name}-campfire.png` });
+
+  await page.getByRole('button', { name: /Pat/ }).click();
+  await expect(world).toHaveAttribute('data-interaction', /^pat:/);
+
+  // Sound is opt-in: nothing is created until the visitor asks for it, and the choice is remembered.
+  expect(await page.evaluate(() => (window as unknown as { __contexts: number }).__contexts)).toBe(0);
+  const sound = page.getByTestId('island-sound');
+  await expect(sound).toHaveAttribute('aria-pressed', 'false');
+  await sound.click();
+  await expect(sound).toHaveAttribute('aria-pressed', 'true');
+  expect(await page.evaluate(() => (window as unknown as { __contexts: number }).__contexts)).toBe(1);
+  expect(await page.evaluate(() => localStorage.getItem('island-sound'))).toBe('on');
+  await sound.click();
+  await expect(sound).toHaveAttribute('aria-pressed', 'false');
+  expect(errors).toEqual([]);
+});
+
 test('HTML controls fish and walk without the canvas', async ({ page }) => {
   const world = await openIsland(page);
   const before = await position(world);
@@ -242,9 +289,11 @@ test('reduced motion renders a still idle frame and still walks and fishes on co
   const canvas = page.locator('canvas.island-canvas');
   await canvas.scrollIntoViewIfNeeded();
   await page.waitForTimeout(1000);
-  const first = await canvas.screenshot();
+  // This compares the 3D frame only. Speech bubbles are DOM over the canvas and come and go on their own.
+  const still = { style: '.island-speech { visibility: hidden !important; }' };
+  const first = await canvas.screenshot(still);
   await page.waitForTimeout(2000);
-  const second = await canvas.screenshot();
+  const second = await canvas.screenshot(still);
   expect(second.equals(first), 'idle frame changed under reduced motion').toBe(true);
   await page.screenshot({ path: `${shots}/${testInfo.project.name}-reduced-motion.png` });
 

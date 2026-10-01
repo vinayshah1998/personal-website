@@ -68,6 +68,14 @@ describe('movement', () => {
     assert.ok(distance < tree.radius + LAYOUT.playerRadius + 0.05);
   });
 
+  it('walks around the campfire, the log seat and the sign instead of through them', () => {
+    for (const prop of [LAYOUT.campfire, LAYOUT.logSeat, LAYOUT.sign]) {
+      assert.equal(isWalkable(prop.center), false);
+      const end = run(at([prop.center[0] - 2, prop.center[1]]), { axis: [1, 0], commands: [] }, 3);
+      assert.ok(Math.hypot(end.position[0] - prop.center[0], end.position[1] - prop.center[1]) >= prop.radius + LAYOUT.playerRadius - 1e-9);
+    }
+  });
+
   it('walks to a tapped ground point', () => {
     const goal: Vec2 = [-3.0, 5.0];
     const start = step(createWorld(), { axis: [0, 0], commands: [{ type: 'tap', point: goal }] }, DT);

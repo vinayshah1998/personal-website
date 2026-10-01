@@ -1,8 +1,77 @@
 'use client';
 
-import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
+import { CATCH_LINES, greeting, pick } from '@/lib/island/dialogue';
 import { FISH, type FishingPhase, type Vec2 } from '@/lib/island/world';
-import type { IslandScene, IslandSnapshot } from './IslandScene';
+import { IslandAudio } from './IslandAudio';
+import type { Interaction, IslandScene, IslandSnapshot } from './IslandScene';
+
+interface Line {
+  readonly id: number;
+  readonly text: string;
+  /** Pause before the bubble pops in, so the island can fade in first. */
+  readonly delay: number;
+}
+
+const SOUND_KEY = 'island-sound';
+const TYPE_MS = 38;
+const MUSE_AFTER_MS = 24_000;
+const GREETING_DELAY_MS = 700;
+
+function SpeechBubble({
+  line,
+  reducedMotion,
+  onChar,
+  onDone,
+}: {
+  line: Line;
+  reducedMotion: boolean;
+  onChar: (char: string, index: number) => void;
+  onDone: (id: number) => void;
+}) {
+  const [shown, setShown] = useState(reducedMotion ? line.text.length : 0);
+  const onCharRef = useRef(onChar);
+  const onDoneRef = useRef(onDone);
+  onCharRef.current = onChar;
+  onDoneRef.current = onDone;
+
+  useEffect(() => {
+    // Under reduced motion the whole line appears at once, with one chirp, and still lingers before hiding.
+    const start = performance.now() + (reducedMotion ? 0 : line.delay);
+    const length = line.text.length;
+    const linger = length * TYPE_MS + 2800 + length * 40;
+    let typed = 0;
+    let frame = 0;
+    const tick = (now: number) => {
+      const target = now < start ? 0 : reducedMotion ? length : Math.min(length, Math.floor((now - start) / TYPE_MS) + 1);
+      if (target > typed) {
+        // One chirp per frame keeps the babble tidy even when frames are slow.
+        onCharRef.current(line.text[reducedMotion ? 0 : target - 1], target - 1);
+        typed = target;
+        setShown(typed);
+      }
+      if (now - start >= linger) onDoneRef.current(line.id);
+      else frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [line, reducedMotion]);
+
+  return (
+    <div
+      className="island-bubble"
+      data-testid="island-bubble"
+      data-done={shown >= line.text.length}
+      style={reducedMotion ? undefined : { animationDelay: `${line.delay}ms` }}
+    >
+      <span aria-hidden="true">
+        {line.text.slice(0, shown)}
+        <span className="island-bubble-rest">{line.text.slice(shown)}</span>
+      </span>
+      <span className="sr-only">{line.text}</span>
+    </div>
+  );
+}
 
 type Status = 'loading' | 'ready' | 'fallback';
 
@@ -49,11 +118,48 @@ export default function IslandWorld() {
   const pointerRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const [status, setStatus] = useState<Status>('loading');
   const [snapshot, setSnapshot] = useState<IslandSnapshot>({ phase: 'idle', caught: 0, lastFish: null });
+  const [line, setLine] = useState<Line | null>(null);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [soundOn, setSoundOn] = useState(false);
+  const audioRef = useRef<IslandAudio | null>(null);
+  const lineIdRef = useRef(0);
+  const lastLineRef = useRef('');
+  const quietSinceRef = useRef(0);
+  const previousPhaseRef = useRef<FishingPhase>('idle');
+
+  const audio = () => (audioRef.current ??= new IslandAudio());
+
+  const say = useCallback((text: string, delay = 0) => {
+    lastLineRef.current = text;
+    quietSinceRef.current = Date.now();
+    setLine({ id: ++lineIdRef.current, text, delay });
+  }, []);
+
+  const onLineDone = useCallback((id: number) => {
+    quietSinceRef.current = Date.now();
+    setLine((current) => (current?.id === id ? null : current));
+  }, []);
+
+  const onInteract = useCallback(
+    (kind: Interaction) => {
+      const sounds = { pat: 'pat', tree: 'rustle', sign: 'sign', fire: 'fire' } as const;
+      audioRef.current?.play(sounds[kind]);
+      if (kind === 'tree' && Math.random() < 0.6) return;
+      say(pick(kind, Math.random(), lastLineRef.current));
+    },
+    [say],
+  );
+  const handlersRef = useRef({ onInteract });
+  handlersRef.current = { onInteract };
 
   useEffect(() => {
     let cancelled = false;
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const onMotionChange = () => sceneRef.current?.setReducedMotion(motionQuery.matches);
+    setReducedMotion(motionQuery.matches);
+    const onMotionChange = () => {
+      sceneRef.current?.setReducedMotion(motionQuery.matches);
+      setReducedMotion(motionQuery.matches);
+    };
     motionQuery.addEventListener('change', onMotionChange);
 
     // Keys released while the window is unfocused or hidden never deliver keyup here.
@@ -81,8 +187,14 @@ export default function IslandWorld() {
         sceneRef.current = new IslandScene(host, {
           reducedMotion: motionQuery.matches,
           onSnapshot: setSnapshot,
-          onReady: () => setStatus('ready'),
+          onReady: () => {
+            setStatus('ready');
+            // The greeting is part of arriving, so it lands in the same update as the island itself.
+            say(greeting(new Date().getHours()), GREETING_DELAY_MS);
+          },
           onError: fallBack,
+          onInteract: (kind) => handlersRef.current.onInteract(kind),
+          onStep: (surface) => audioRef.current?.play(surface === 'wood' ? 'step-wood' : 'step-grass'),
         });
       })
       .catch(() => {
@@ -97,7 +209,79 @@ export default function IslandWorld() {
       sceneRef.current?.dispose();
       sceneRef.current = null;
     };
+    // `say` is stable, so the scene is still created exactly once.
+  }, [say]);
+
+  // Sound is opt-in. A remembered "on" resumes on the first gesture, as browsers require.
+  useEffect(() => {
+    if (window.localStorage.getItem(SOUND_KEY) !== 'on') return;
+    const resume = () => {
+      void audio().enable();
+      setSoundOn(true);
+    };
+    window.addEventListener('pointerdown', resume, { once: true });
+    window.addEventListener('keydown', resume, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', resume);
+      window.removeEventListener('keydown', resume);
+    };
   }, []);
+
+  useEffect(() => () => audioRef.current?.dispose(), []);
+
+  const toggleSound = () => {
+    const next = !soundOn;
+    setSoundOn(next);
+    window.localStorage.setItem(SOUND_KEY, next ? 'on' : 'off');
+    if (next) {
+      void audio()
+        .enable()
+        .then(() => audioRef.current?.play('click'));
+    } else audioRef.current?.disable();
+  };
+
+
+  useEffect(() => {
+    const previous = previousPhaseRef.current;
+    const phase = snapshot.phase;
+    if (phase === previous) return;
+    previousPhaseRef.current = phase;
+    const sounds = audioRef.current;
+    switch (phase) {
+      case 'walking-to-pond':
+        if (Math.random() < 0.5) say(pick('cast', Math.random(), lastLineRef.current));
+        break;
+      case 'casting':
+        sounds?.play('cast');
+        break;
+      case 'waiting':
+        sounds?.play('plop');
+        break;
+      case 'bite':
+        sounds?.play('bite');
+        say(pick('bite', Math.random(), lastLineRef.current));
+        break;
+      case 'caught':
+        sounds?.play('catch');
+        if (snapshot.lastFish) say(CATCH_LINES[snapshot.lastFish]);
+        break;
+      case 'idle':
+        break;
+    }
+  }, [snapshot, say]);
+
+  // When nobody has said anything for a while, the penguin thinks out loud.
+  useEffect(() => {
+    if (status !== 'ready') return;
+    const timer = window.setInterval(() => {
+      if (document.hidden || line || previousPhaseRef.current !== 'idle') return;
+      if (Date.now() - quietSinceRef.current < MUSE_AFTER_MS) return;
+      say(pick('muse', Math.random(), lastLineRef.current));
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [status, line, say]);
+
+  const onChar = useCallback((char: string, index: number) => audioRef.current?.blip(char, index), []);
 
   const syncAxis = () => {
     let x = 0;
@@ -117,6 +301,8 @@ export default function IslandWorld() {
     } else if (event.code === 'Space' || event.code === 'KeyF' || event.code === 'Enter') {
       event.preventDefault();
       if (!event.repeat) sceneRef.current?.command({ type: 'action' });
+    } else if (event.code === 'KeyE' && !event.repeat) {
+      sceneRef.current?.pat();
     }
   };
 
@@ -161,7 +347,7 @@ export default function IslandWorld() {
         className="island-world"
         tabIndex={status === 'ready' ? 0 : -1}
         role="application"
-        aria-label="Tiny island with a penguin. Arrow keys or W A S D walk, Space or F fishes."
+        aria-label="Tiny island with a penguin. Arrow keys or W A S D walk, Space or F fishes, E pats the penguin."
         aria-describedby="island-help"
         data-testid="island-world"
         onKeyDown={onKeyDown}
@@ -171,6 +357,11 @@ export default function IslandWorld() {
         onPointerUp={onPointerUp}
         onPointerCancel={() => (pointerRef.current = null)}
       >
+        <div className="island-speech" aria-live="polite">
+          {status === 'ready' && line && (
+            <SpeechBubble key={line.id} line={line} reducedMotion={reducedMotion} onChar={onChar} onDone={onLineDone} />
+          )}
+        </div>
         <div className="island-poster" aria-hidden={status === 'ready'}>
           <svg viewBox="0 0 400 260" role="img" aria-label="Postcard of a tiny forest island with a pond, a dock and a penguin">
             <ellipse cx="200" cy="170" rx="170" ry="62" fill="#b8835a" />
@@ -218,11 +409,20 @@ export default function IslandWorld() {
             ))}
           </div>
         </div>
-        <p className="island-basket" data-testid="island-basket">
-          Basket: {snapshot.caught} {snapshot.caught === 1 ? 'catch' : 'catches'}
-        </p>
+        <div className="island-extras">
+          <p className="island-basket" data-testid="island-basket">
+            Basket: {snapshot.caught} {snapshot.caught === 1 ? 'catch' : 'catches'}
+          </p>
+          <button type="button" className="island-chip" disabled={status !== 'ready'} onClick={() => sceneRef.current?.pat()}>
+            <span aria-hidden="true">♥</span> Pat
+          </button>
+          <button type="button" className="island-chip" aria-pressed={soundOn} data-testid="island-sound" onClick={toggleSound}>
+            <span aria-hidden="true">♪</span> Sound {soundOn ? 'on' : 'off'}
+          </button>
+        </div>
         <p id="island-help" className="island-help">
-          Click or tap the grass to wander. Tap the pond, press Space or F, or use the button to fish. Focus the island for arrow keys.
+          Tap the grass to wander and the pond to fish. Pat the penguin, shake a tree, read the sign, or poke the campfire. Arrow keys and Space work once
+          the island has focus.
         </p>
       </div>
     </div>

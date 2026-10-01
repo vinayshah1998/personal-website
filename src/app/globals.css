@@ -141,6 +141,69 @@ body {
   display: block;
   width: 100%;
   height: 100%;
+  opacity: 0;
+  transition: opacity 900ms ease;
+}
+
+.island-stage[data-status='ready'] .island-canvas {
+  opacity: 1;
+}
+
+.island-speech {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.island-bubble {
+  position: absolute;
+  left: clamp(8.5rem, var(--anchor-x, 50%), calc(100% - 8.5rem));
+  top: max(5.5rem, var(--anchor-y, 40%));
+  max-width: min(17rem, 70%);
+  width: max-content;
+  padding: 0.6rem 1rem 0.65rem;
+  transform: translate(-50%, calc(-100% - 14px));
+  border-radius: 22px;
+  background: #fffaf0;
+  border: 2px solid #ecd3a8;
+  box-shadow: 0 5px 0 #ecd3a8, 0 14px 28px rgba(120, 80, 30, 0.18);
+  color: #4a3524;
+  font: 600 0.95rem/1.4 ui-rounded, 'SF Pro Rounded', 'Nunito', 'Varela Round', system-ui, sans-serif;
+  text-align: center;
+  animation: island-bubble-in 280ms cubic-bezier(0.3, 1.6, 0.5, 1) both;
+}
+
+/* The tail is two plain border triangles: outline, then fill. */
+.island-bubble::before,
+.island-bubble::after {
+  content: '';
+  position: absolute;
+  left: calc(50% - 12px);
+  border-style: solid;
+  border-color: transparent;
+  border-width: 12px 12px 0;
+}
+
+.island-bubble::before {
+  bottom: -14px;
+  border-top-color: #ecd3a8;
+}
+
+.island-bubble::after {
+  bottom: -10px;
+  border-top-color: #fffaf0;
+}
+
+.island-bubble-rest {
+  visibility: hidden;
+}
+
+@keyframes island-bubble-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-100% - 4px)) scale(0.6);
+  }
 }
 
 .island-poster {
@@ -230,11 +293,50 @@ body {
   background: #eed4a8;
 }
 
-.island-basket {
+.island-extras {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
   margin-top: 0.6rem;
+}
+
+.island-basket {
+  flex: 1;
   font-weight: 600;
   font-size: 0.85rem;
   color: var(--saffron);
+}
+
+.island-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 2rem;
+  padding: 0 0.7rem;
+  border-radius: 999px;
+  background: #f3e3c6;
+  color: var(--ink);
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: 0 2px 0 #e2c99f;
+}
+
+.island-chip:hover:not(:disabled) {
+  background: #eed4a8;
+}
+
+.island-chip:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.island-chip[aria-pressed='false'] span {
+  opacity: 0.45;
+}
+
+.island-chip[aria-pressed='true'] {
+  background: #ffd9a0;
+  box-shadow: 0 2px 0 #e9b56b;
 }
 
 .island-help {
@@ -337,7 +439,11 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .island-path,
-  .island-action {
+  .island-action,
+  .island-canvas {
     transition: none;
+  }
+  .island-bubble {
+    animation: none;
   }
 }
