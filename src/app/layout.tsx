@@ -41,12 +41,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={inter.className}>
-      <body className="antialiased bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+      <body className="antialiased">
         <div className="min-h-screen flex flex-col">
-          <header className="py-6 border-b border-[#ecdcc3] dark:border-gray-800">
+          <header className="py-6 border-b border-line bg-paper">
             <div className="max-w-4xl mx-auto px-6 flex flex-wrap justify-between items-center gap-x-6 gap-y-2">
               <Link href="/">
-                <h1 className="text-lg font-semibold whitespace-nowrap hover:text-gray-600 dark:hover:text-gray-400 transition-colors cursor-pointer">
+                <h1 className="font-display text-xl font-bold whitespace-nowrap text-ink hover:text-forest transition-colors cursor-pointer">
                   Vinay Shah
                 </h1>
               </Link>

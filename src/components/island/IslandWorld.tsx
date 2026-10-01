@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { CATCH_LINES, greeting, pick } from '@/lib/island/dialogue';
-import { FISH, type FishingPhase, type Vec2 } from '@/lib/island/world';
+import { FISH, FISH_KINDS, type FishKind, type FishingPhase, type Vec2 } from '@/lib/island/world';
 import { IslandAudio } from './IslandAudio';
 import type { Interaction, IslandScene, IslandSnapshot } from './IslandScene';
 
@@ -17,6 +17,30 @@ const SOUND_KEY = 'island-sound';
 const TYPE_MS = 38;
 const MUSE_AFTER_MS = 24_000;
 const GREETING_DELAY_MS = 700;
+
+function FishIcon({ kind, color }: { kind: FishKind; color?: string }) {
+  const fill = color ?? 'currentColor';
+  if (kind === 'lilyLeaf') {
+    return (
+      <svg viewBox="0 0 40 28" aria-hidden="true">
+        <path d="M20 14 L29 7 A11 11 0 1 1 22 3.2 Z" fill={fill} />
+        {color && <path d="M20 14 L13 8 M20 14 L12 17 M20 14 L21 24" stroke="rgba(30,60,30,0.35)" strokeWidth="1.3" fill="none" />}
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 40 28" aria-hidden="true">
+      <path d="M29 14 L38 6.5 L36.5 14 L38 21.5 Z" fill={fill} />
+      <path d="M4 14 C8 4.5 24 3.5 31 14 C24 24.5 8 23.5 4 14 Z" fill={fill} />
+      {color && (
+        <>
+          <path d="M18 7.5 C20.5 11 20.5 17 18 20.5" stroke="rgba(43,58,44,0.25)" strokeWidth="1.4" fill="none" />
+          <circle cx="10.5" cy="12.3" r="1.9" fill="#2b2a33" />
+        </>
+      )}
+    </svg>
+  );
+}
 
 function SpeechBubble({
   line,
@@ -117,7 +141,7 @@ export default function IslandWorld() {
   const keysRef = useRef(new Set<string>());
   const pointerRef = useRef<{ x: number; y: number; time: number } | null>(null);
   const [status, setStatus] = useState<Status>('loading');
-  const [snapshot, setSnapshot] = useState<IslandSnapshot>({ phase: 'idle', caught: 0, lastFish: null });
+  const [snapshot, setSnapshot] = useState<IslandSnapshot>({ phase: 'idle', caught: 0, lastFish: null, counts: {} });
   const [line, setLine] = useState<Line | null>(null);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [soundOn, setSoundOn] = useState(false);
@@ -420,6 +444,26 @@ export default function IslandWorld() {
             <span aria-hidden="true">♪</span> Sound {soundOn ? 'on' : 'off'}
           </button>
         </div>
+        <ul className="island-catches" aria-label="Fish in your basket" data-testid="island-catches">
+          {FISH_KINDS.map((kind) => {
+            const count = snapshot.counts[kind] ?? 0;
+            const label = count ? `${FISH[kind].label} × ${count}` : 'Not caught yet';
+            return (
+              <li key={kind} className="island-catch" data-kind={kind} data-count={count} title={label}>
+                {/* Remounting on each new catch replays the little pop. */}
+                <span key={count} className={count ? 'island-catch-icon is-caught' : 'island-catch-icon'}>
+                  <FishIcon kind={kind} color={count ? FISH[kind].color : undefined} />
+                </span>
+                {count > 1 && (
+                  <span className="island-catch-count" aria-hidden="true">
+                    {count}
+                  </span>
+                )}
+                <span className="sr-only">{label}</span>
+              </li>
+            );
+          })}
+        </ul>
         <p id="island-help" className="island-help">
           Tap the grass to wander and the pond to fish. Pat the penguin, shake a tree, read the sign, or poke the campfire. Arrow keys and Space work once
           the island has focus.

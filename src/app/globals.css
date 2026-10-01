@@ -2,22 +2,71 @@
 @plugin "@tailwindcss/typography";
 
 :root {
-  --background: #fbf6ec;
-  --foreground: #171717;
+  /* The island palette, shared by every page. Dark mode is the same island in the evening. */
+  --paper: #fbf6ec;
+  --card: #fffaf1;
+  --line: #ecdcc3;
+  --line-strong: #e2c99f;
+  --ink: #2b3a2c;
+  --ink-soft: #5b5343;
+  --forest: #3f7d57;
+  --saffron: #b8650f;
+  --saffron-bright: #e0892a;
+  --chip: #eef3e2;
+  --chip-ink: #3f6a47;
+  --sand: #f3e3c6;
+  --sand-strong: #eed4a8;
+  --pond: #2b7c80;
+  --berry: #b44a6c;
+  --sky-glow: #fff4e2;
+  --sky-mid: #fbe9d2;
+  --sky-top: #f9d9b8;
+  --background: var(--paper);
+  --foreground: var(--ink);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #1d1914;
+    --card: #28221b;
+    --line: #3b3128;
+    --line-strong: #4b3e31;
+    --ink: #f3eadb;
+    --ink-soft: #cbbda7;
+    --forest: #93d3a3;
+    --saffron: #f2b26a;
+    --saffron-bright: #f2a95a;
+    --chip: #2c3a2e;
+    --chip-ink: #cfe6d3;
+    --sand: #3a3027;
+    --sand-strong: #4a3d31;
+    --pond: #7fcfd0;
+    --berry: #ee9ab4;
+    --sky-glow: #4a3a33;
+    --sky-mid: #2e2520;
+    --sky-top: #1d1914;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-forest: var(--forest);
+  --color-saffron: var(--saffron);
+  --color-chip: var(--chip);
+  --color-chip-ink: var(--chip-ink);
+  --color-sand: var(--sand);
+  --color-pond: var(--pond);
+  --color-berry: var(--berry);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, ui-serif, serif;
 }
 
 body {
@@ -26,33 +75,103 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Small building blocks so the inner pages match the island. */
+@layer components {
+  .page-kicker {
+    font: 600 0.8rem/1.2 ui-sans-serif, system-ui, sans-serif;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--forest);
+    margin-bottom: 0.75rem;
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.4rem, 5vw, 3.4rem);
+    line-height: 1.05;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  .page-lede {
+    margin-top: 1rem;
+    font-size: 1.15rem;
+    line-height: 1.6;
+    color: var(--ink-soft);
+  }
+
+  .cozy-card {
+    border-radius: 18px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    box-shadow: 0 3px 0 var(--line-strong);
+  }
+
+  .cozy-tag {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.72rem;
+    border-radius: 999px;
+    background: var(--chip);
+    color: var(--chip-ink);
+  }
+
+  .cozy-link {
+    color: var(--forest);
+    font-weight: 600;
+  }
+
+  .cozy-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+/* Typography plugin colors, unlayered so they win over its defaults. */
+.prose-cozy {
+  --tw-prose-body: var(--ink-soft);
+  --tw-prose-headings: var(--ink);
+  --tw-prose-lead: var(--ink-soft);
+  --tw-prose-links: var(--forest);
+  --tw-prose-bold: var(--ink);
+  --tw-prose-counters: var(--ink-soft);
+  --tw-prose-bullets: var(--line-strong);
+  --tw-prose-hr: var(--line);
+  --tw-prose-quotes: var(--ink);
+  --tw-prose-quote-borders: var(--line-strong);
+  --tw-prose-captions: var(--ink-soft);
+  --tw-prose-code: var(--ink);
+  --tw-prose-pre-code: #f3eadb;
+  --tw-prose-pre-bg: #2b2620;
+  --tw-prose-th-borders: var(--line-strong);
+  --tw-prose-td-borders: var(--line);
+}
+
+.prose-cozy :where(h1, h2, h3) {
+  font-family: var(--font-display);
+}
+
+/* Desktop: words and controls on the left, the island alone on the right, so nothing covers it. */
 .island-hero {
-  --sky-top: #f9d9b8;
-  --sky-mid: #fbe9d2;
-  --paper: #fbf6ec;
-  --ink: #2b3a2c;
-  --ink-soft: #5b5343;
-  --forest: #3f7d57;
-  --saffron: #e0892a;
+  --gutter: clamp(1.25rem, 5vw, 4rem);
   position: relative;
   display: grid;
+  grid-template-columns: minmax(19rem, 2fr) minmax(0, 3fr);
+  grid-template-rows: auto 1fr;
+  column-gap: clamp(0.5rem, 2vw, 2rem);
   min-height: min(92vh, 900px);
-  background: radial-gradient(120% 90% at 70% 30%, #fff4e2 0%, var(--sky-mid) 45%, var(--sky-top) 100%);
+  padding-bottom: clamp(1rem, 3vw, 2.5rem);
+  background: radial-gradient(120% 90% at 70% 30%, var(--sky-glow) 0%, var(--sky-mid) 45%, var(--sky-top) 100%);
   overflow: hidden;
-  border-bottom: 1px solid #ecdcc3;
+  border-bottom: 1px solid var(--line);
 }
 
 .island-intro {
-  position: relative;
-  z-index: 2;
-  align-self: start;
-  padding: clamp(1.5rem, 4vw, 3.5rem) clamp(1.25rem, 5vw, 4rem) 0;
+  grid-column: 1;
+  grid-row: 1;
+  padding: clamp(1.5rem, 4vw, 3.5rem) 0 0 var(--gutter);
   max-width: 34rem;
-  pointer-events: none;
-}
-
-.island-intro a {
-  pointer-events: auto;
 }
 
 .island-kicker {
@@ -64,7 +183,7 @@ body {
 }
 
 .island-title {
-  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, ui-serif, serif;
+  font-family: var(--font-display);
   font-size: clamp(2.6rem, 6vw, 4.6rem);
   line-height: 1;
   font-weight: 700;
@@ -92,9 +211,9 @@ body {
   flex-direction: column;
   padding: 0.65rem 0.9rem;
   border-radius: 14px;
-  background: rgba(255, 250, 240, 0.82);
-  border: 1px solid #ead7b8;
-  box-shadow: 0 2px 0 #e7cfa9;
+  background: color-mix(in srgb, var(--card) 85%, transparent);
+  border: 1px solid var(--line);
+  box-shadow: 0 2px 0 var(--line-strong);
   color: var(--ink);
   font-weight: 600;
   transition: transform 150ms ease, box-shadow 150ms ease;
@@ -109,24 +228,26 @@ body {
 .island-path:hover,
 .island-path:focus-visible {
   transform: translateY(-2px);
-  box-shadow: 0 4px 0 #e0c193;
+  box-shadow: 0 4px 0 var(--line-strong);
 }
 
 .island-path:focus-visible,
 .island-world:focus-visible,
 .island-controls button:focus-visible {
-  outline: 3px solid var(--saffron);
+  outline: 3px solid var(--saffron-bright);
   outline-offset: 3px;
 }
 
+/* The stage's children join the hero grid directly. */
 .island-stage {
-  position: absolute;
-  inset: 0;
+  display: contents;
 }
 
 .island-world {
-  position: absolute;
-  inset: 0;
+  position: relative;
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  min-height: 32rem;
   touch-action: pan-y;
   cursor: pointer;
   border-radius: 0;
@@ -208,7 +329,7 @@ body {
 
 .island-poster {
   position: absolute;
-  inset: 8% 4% 12% 38%;
+  inset: 8%;
   display: grid;
   place-items: center;
 }
@@ -224,39 +345,48 @@ body {
 }
 
 .island-controls {
-  position: absolute;
+  position: relative;
   z-index: 3;
-  right: clamp(0.75rem, 3vw, 2.5rem);
-  bottom: clamp(0.75rem, 3vw, 2rem);
-  width: min(21rem, calc(100% - 1.5rem));
+  grid-column: 1;
+  grid-row: 2;
+  align-self: start;
+  width: min(26rem, calc(100% - var(--gutter)));
+  margin: 1.5rem 0 0 var(--gutter);
   padding: 0.9rem 1rem;
   border-radius: 18px;
-  background: rgba(255, 250, 241, 0.9);
-  border: 1px solid #ead7b8;
-  box-shadow: 0 10px 30px rgba(120, 80, 30, 0.12);
+  background: color-mix(in srgb, var(--card) 92%, transparent);
+  border: 1px solid var(--line);
+  box-shadow: 0 3px 0 var(--line-strong), 0 10px 30px rgba(120, 80, 30, 0.1);
   color: var(--ink);
-  backdrop-filter: blur(6px);
+  /* Status and the big button on the left, the d-pad beside them, the rest underneath. */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'status dpad'
+    'action dpad'
+    'extras extras'
+    'catches catches'
+    'help help';
+  column-gap: 0.9rem;
 }
 
 .island-status {
+  grid-area: status;
   min-height: 2.6em;
   font-size: 0.95rem;
   line-height: 1.35;
 }
 
 .island-control-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-top: 0.6rem;
+  display: contents;
 }
 
 .island-action {
-  flex: 1;
+  grid-area: action;
+  align-self: end;
   min-height: 2.9rem;
   border-radius: 999px;
-  background: var(--forest);
+  background: #3f7d57;
   color: #fffaf0;
   font-weight: 700;
   box-shadow: 0 3px 0 #2c5c3f;
@@ -268,12 +398,13 @@ body {
 }
 
 .island-action:disabled {
-  background: #a9b89e;
-  box-shadow: 0 3px 0 #8d9b83;
+  background: color-mix(in srgb, #3f7d57 45%, var(--card));
+  box-shadow: 0 3px 0 color-mix(in srgb, #2c5c3f 45%, var(--card));
   cursor: default;
 }
 
 .island-dpad {
+  grid-area: dpad;
   display: grid;
   grid-template-areas: '. up .' 'left . right' '. down .';
   grid-template-columns: repeat(3, 2.75rem);
@@ -283,17 +414,18 @@ body {
 
 .island-dpad button {
   border-radius: 8px;
-  background: #f3e3c6;
+  background: var(--sand);
   color: var(--ink);
   font-size: 0.95rem;
   line-height: 1;
 }
 
 .island-dpad button:hover:not(:disabled) {
-  background: #eed4a8;
+  background: var(--sand-strong);
 }
 
 .island-extras {
+  grid-area: extras;
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -314,15 +446,15 @@ body {
   min-height: 2rem;
   padding: 0 0.7rem;
   border-radius: 999px;
-  background: #f3e3c6;
+  background: var(--sand);
   color: var(--ink);
   font-size: 0.8rem;
   font-weight: 600;
-  box-shadow: 0 2px 0 #e2c99f;
+  box-shadow: 0 2px 0 var(--line-strong);
 }
 
 .island-chip:hover:not(:disabled) {
-  background: #eed4a8;
+  background: var(--sand-strong);
 }
 
 .island-chip:disabled {
@@ -336,11 +468,71 @@ body {
 
 .island-chip[aria-pressed='true'] {
   background: #ffd9a0;
+  color: #4a3524;
   box-shadow: 0 2px 0 #e9b56b;
 }
 
+/* The basket: one slot per kind of fish, a silhouette until you catch one. */
+.island-catches {
+  grid-area: catches;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.3rem;
+  margin-top: 0.55rem;
+}
+
+.island-catch {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 2.4rem;
+  border-radius: 10px;
+  background: var(--sand);
+  color: var(--line-strong);
+}
+
+.island-catch[data-count='0'] {
+  background: color-mix(in srgb, var(--sand) 55%, transparent);
+}
+
+.island-catch-icon {
+  display: block;
+  width: 1.9rem;
+}
+
+.island-catch-icon svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+
+.island-catch-icon.is-caught svg {
+  filter: drop-shadow(0 1px 0 rgba(60, 40, 20, 0.35));
+  animation: island-catch-pop 520ms cubic-bezier(0.3, 1.8, 0.5, 1) both;
+}
+
+.island-catch-count {
+  position: absolute;
+  top: -0.35rem;
+  right: -0.25rem;
+  min-width: 1.15rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  background: #3f7d57;
+  color: #fffaf0;
+  font: 700 0.66rem/1.15rem ui-sans-serif, system-ui, sans-serif;
+  text-align: center;
+}
+
+@keyframes island-catch-pop {
+  from {
+    transform: scale(0.2) rotate(-25deg);
+  }
+}
+
 .island-help {
-  margin-top: 0.25rem;
+  grid-area: help;
+  margin-top: 0.45rem;
   font-size: 0.76rem;
   line-height: 1.4;
   color: var(--ink-soft);
@@ -359,80 +551,39 @@ body {
 }
 
 .home-heading {
-  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, ui-serif, serif;
+  font-family: var(--font-display);
   font-size: 1.9rem;
   font-weight: 700;
-  color: #2b3a2c;
+  color: var(--ink);
 }
 
-.home-link {
-  color: #3f7d57;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.home-link:hover {
-  text-decoration: underline;
-}
-
-.home-project {
-  padding: 1.25rem;
-  border-radius: 18px;
-  background: #fffaf1;
-  border: 1px solid #efdfc4;
-  box-shadow: 0 3px 0 #efdcbc;
-}
-
-.home-tag {
-  padding: 0.2rem 0.55rem;
-  font-size: 0.72rem;
-  border-radius: 999px;
-  background: #eef3e2;
-  color: #3f6a47;
-}
-
-@media (prefers-color-scheme: dark) {
-  .home-heading {
-    color: #f3eee4;
-  }
-  .home-project {
-    background: #1d2320;
-    border-color: #2f3a33;
-    box-shadow: none;
-  }
-  .home-tag {
-    background: #26352b;
-    color: #cfe6d3;
-  }
-}
-
+/* Phones and narrow windows: intro, then the island, then the controls below it. */
 @media (max-width: 820px) {
   .island-hero {
     min-height: 0;
-    grid-template-rows: auto auto;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    padding-bottom: 0;
+  }
+  .island-intro,
+  .island-world,
+  .island-controls {
+    grid-column: 1;
+    grid-row: auto;
   }
   .island-intro {
-    padding-bottom: 0.5rem;
+    max-width: none;
+    padding: clamp(1.5rem, 4vw, 3.5rem) var(--gutter) 0.5rem;
   }
   .island-poster {
     inset: 6%;
   }
   .island-controls {
-    position: relative;
-    right: auto;
-    bottom: auto;
     width: auto;
-    margin: -1rem 0.75rem 1rem;
-  }
-  .island-stage {
-    position: relative;
-    inset: auto;
-    display: flex;
-    flex-direction: column;
+    margin: 0 0.75rem 1rem;
   }
   .island-world {
-    position: relative;
-    inset: auto;
+    min-height: 0;
     height: clamp(320px, 96vw, 560px);
   }
 }
@@ -443,7 +594,8 @@ body {
   .island-canvas {
     transition: none;
   }
-  .island-bubble {
+  .island-bubble,
+  .island-catch-icon.is-caught svg {
     animation: none;
   }
 }

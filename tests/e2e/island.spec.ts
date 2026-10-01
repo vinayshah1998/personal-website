@@ -128,6 +128,19 @@ test('desktop header keeps brand and nav on one row', async ({ page, isMobile })
   expect(nav!.height).toBeLessThan(40);
 });
 
+test('the controls sit beside or below the island and never cover it', async ({ page, isMobile }) => {
+  const sizes = isMobile ? [null, { width: 390, height: 844 }] : [null, { width: 1280, height: 720 }, { width: 1024, height: 768 }, { width: 1920, height: 1080 }];
+  for (const size of sizes) {
+    if (size) await page.setViewportSize(size);
+    await openIsland(page);
+    const world = (await page.getByTestId('island-world').boundingBox())!;
+    const controls = (await page.locator('.island-controls').boundingBox())!;
+    const overlaps =
+      controls.x < world.x + world.width && world.x < controls.x + controls.width && controls.y < world.y + world.height && world.y < controls.y + controls.height;
+    expect(overlaps, `controls overlap the island at ${JSON.stringify(size ?? page.viewportSize())}`).toBe(false);
+  }
+});
+
 test('penguin walks by tap or click and fishes a full cast, bite and catch', async ({ page, isMobile }, testInfo) => {
   const errors = trackErrors(page);
   const world = await openIsland(page);
@@ -153,6 +166,14 @@ test('penguin walks by tap or click and fishes a full cast, bite and catch', asy
   await expect(world).toHaveAttribute('data-phase', 'caught');
   await expect(page.getByTestId('island-basket')).toHaveText('Basket: 1 catch');
   await expect(page.getByTestId('island-status')).toContainText('You caught');
+  // The catch lands in its own basket slot; the other five stay silhouettes.
+  const slots = page.getByTestId('island-catches').getByRole('listitem');
+  await expect(slots).toHaveCount(6);
+  await expect(slots.and(page.locator('[data-count="1"]'))).toHaveCount(1);
+  await expect(slots.and(page.locator('[data-count="0"]'))).toHaveCount(5);
+  const caughtLabel = await slots.and(page.locator('[data-count="1"]')).getAttribute('title');
+  expect(caughtLabel).toMatch(/× 1$/);
+  expect(await page.getByTestId('island-status').textContent()).toContain(caughtLabel!.replace(' × 1', '').toLowerCase());
   await page.waitForTimeout(400);
   await page.screenshot({ path: `${shots}/${testInfo.project.name}-caught.png` });
   expect(errors).toEqual([]);

@@ -49,15 +49,16 @@ export default async function BlogPostPage({ params }: PageProps) {
     <article className="max-w-4xl mx-auto px-6 py-16">
       <Link
         href="/blog"
-        className="inline-block mb-8 text-blue-600 dark:text-blue-400 hover:underline"
+        className="inline-block mb-8 cozy-link"
       >
         ← Back to Blog
       </Link>
 
       <header className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
+        <p className="page-kicker">Notes &amp; fixes</p>
+        <h1 className="page-title mb-4">{post.title}</h1>
 
-        <div className="flex items-center gap-4 text-gray-600 dark:text-gray-400">
+        <div className="flex items-center gap-4 text-ink-soft">
           <time dateTime={post.date}>
             {new Date(post.date).toLocaleDateString('en-US', {
               year: 'numeric',
@@ -71,7 +72,7 @@ export default async function BlogPostPage({ params }: PageProps) {
               {post.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-sm"
+                  className="cozy-tag"
                 >
                   {tag}
                 </span>
@@ -81,14 +82,14 @@ export default async function BlogPostPage({ params }: PageProps) {
         </div>
       </header>
 
-      <div className="border-t border-gray-200 dark:border-gray-800 pt-8">
+      <div className="border-t border-line pt-8">
         <MarkdownContent content={post.content} />
       </div>
 
-      <footer className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
+      <footer className="mt-12 pt-8 border-t border-line">
         <Link
           href="/blog"
-          className="text-blue-600 dark:text-blue-400 hover:underline"
+          className="cozy-link"
         >
           ← Back to Blog
         </Link>

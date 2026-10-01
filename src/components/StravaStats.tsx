@@ -20,34 +20,34 @@ const StatsCard = ({ title, count, distance, time, elevation }: StatsCardProps) 
   };
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-800 p-6 rounded-lg">
-      <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
+    <div className="cozy-card p-6">
+      <h3 className="font-display text-xl font-bold mb-4 text-ink">
         {title}
       </h3>
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+          <p className="text-2xl font-bold text-pond">
             {count}
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Activities</p>
+          <p className="text-sm text-ink-soft">Activities</p>
         </div>
         <div>
-          <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+          <p className="text-2xl font-bold text-forest">
             {formatDistance(distance)} mi
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Distance</p>
+          <p className="text-sm text-ink-soft">Distance</p>
         </div>
         <div>
-          <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+          <p className="text-2xl font-bold text-berry">
             {formatTime(time)}
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Time</p>
+          <p className="text-sm text-ink-soft">Time</p>
         </div>
         <div>
-          <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+          <p className="text-2xl font-bold text-saffron">
             {Math.round(elevation)} m
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">Elevation</p>
+          <p className="text-sm text-ink-soft">Elevation</p>
         </div>
       </div>
     </div>
@@ -63,20 +63,20 @@ const RecentActivity = ({ activity }: { activity: StravaActivity }) => {
   };
 
   return (
-    <div className="flex justify-between items-center py-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
+    <div className="flex justify-between items-center py-3 border-b border-line last:border-b-0">
       <div>
-        <h4 className="font-medium text-gray-900 dark:text-gray-100">
+        <h4 className="font-medium text-ink">
           {activity.name}
         </h4>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-ink-soft">
           {formatDate(activity.start_date)} • {activity.type}
         </p>
       </div>
       <div className="text-right">
-        <p className="font-semibold text-gray-900 dark:text-gray-100">
+        <p className="font-semibold text-ink">
           {formatDistance(activity.distance)} mi
         </p>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-ink-soft">
           {Math.round(activity.moving_time / 60)} min
         </p>
       </div>
@@ -118,8 +118,8 @@ export default function StravaStats({ stats, activities }: StravaStatsProps) {
       </div>
 
       {activities.length > 0 && (
-        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg p-6">
-          <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
+        <div className="cozy-card p-6">
+          <h3 className="font-display text-xl font-bold mb-4 text-ink">
             Recent Activities
           </h3>
           <div className="space-y-0">

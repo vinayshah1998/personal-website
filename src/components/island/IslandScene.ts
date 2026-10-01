@@ -1,7 +1,9 @@
 import * as THREE from 'three';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {
+  countCatches,
   createWorld,
+  FISH,
   inPond,
   isWalkable,
   LAYOUT,
@@ -19,6 +21,7 @@ export interface IslandSnapshot {
   readonly phase: FishingPhase;
   readonly caught: number;
   readonly lastFish: FishKind | null;
+  readonly counts: Readonly<Partial<Record<FishKind, number>>>;
 }
 
 export interface IslandSceneOptions {
@@ -46,15 +49,6 @@ interface Puff {
   readonly mesh: THREE.Mesh<THREE.IcosahedronGeometry, THREE.MeshBasicMaterial>;
   readonly offset: number;
 }
-
-const FISH_TINT: Record<FishKind, string> = {
-  minnow: '#9fb8cc',
-  goby: '#d2a86c',
-  trout: '#8fb07c',
-  koi: '#f2894b',
-  moonCarp: '#ece6f7',
-  lilyLeaf: '#6ab26b',
-};
 
 const ROD_PHASES: ReadonlySet<FishingPhase> = new Set(['casting', 'waiting', 'bite', 'caught']);
 
@@ -680,7 +674,7 @@ export class IslandScene {
 
     for (let i = 0; i < 4; i++) {
       const cloud = this.template(source, 'Cloud').clone();
-      cloud.position.set(0, 3.2 + (i % 2) * 1.1, -13 - (i % 3) * 1.5);
+      cloud.position.set(0, 1.6 + (i % 2) * 0.9, -12.5 - (i % 3) * 1.5);
       this.clouds.push({ object: cloud, speed: 0.18 + i * 0.04, offset: i * 6, size: 1 + (i % 2) * 0.4 });
       this.scene.add(cloud);
     }
@@ -719,7 +713,7 @@ export class IslandScene {
     this.scene.add(bobber);
 
     const fish = this.template(source, 'Fish').clone();
-    this.fishMaterial = new THREE.MeshStandardMaterial({ color: FISH_TINT.koi, roughness: 0.6 });
+    this.fishMaterial = new THREE.MeshStandardMaterial({ color: FISH.koi.color, roughness: 0.6 });
     this.disposables.add(this.fishMaterial);
     fish.traverse((child) => {
       if (child instanceof THREE.Mesh && child.name.startsWith('FishBody')) child.material = this.fishMaterial;
@@ -913,11 +907,10 @@ export class IslandScene {
     const halfFov = THREE.MathUtils.degToRad(this.camera.fov / 2);
     const distance = Math.max(fitHeight / (2 * Math.tan(halfFov)), fitWidth / (2 * Math.tan(halfFov) * aspect));
     const direction = new THREE.Vector3(0, 0.84, 1).normalize();
-    const target = new THREE.Vector3(wide ? -1.2 : 0.2, 0, wide ? 1.3 : 0.9);
+    // The canvas has its own column now, so the island simply sits in the middle of it.
+    const target = new THREE.Vector3(0.2, 0, 0.9);
     this.camera.position.copy(target).addScaledVector(direction, distance);
     this.camera.lookAt(target);
-    if (wide) this.camera.setViewOffset(width, height, -width * 0.14, 0, width, height);
-    else this.camera.clearViewOffset();
     this.camera.updateProjectionMatrix();
     this.exposeLandmarks(width, height);
     this.lastAnchor = '';
@@ -1302,7 +1295,7 @@ export class IslandScene {
       const caught = fishing.kind === 'caught';
       this.fishDisplay.visible = caught;
       if (caught) {
-        this.fishMaterial.color.set(FISH_TINT[fishing.fish]);
+        this.fishMaterial.color.set(FISH[fishing.fish].color);
         this.fishDisplay.position.set(position[0], 2.05 + Math.sin(t * 2.5) * 0.08 * motion, position[1]);
         this.fishDisplay.rotation.set(0, t * 1.2 * motion + 0.6, Math.PI / 2 + Math.sin(t * 5) * 0.2 * motion);
       }
@@ -1314,7 +1307,7 @@ export class IslandScene {
     const snapshotKey = `${fishing.kind}|${caught.length}`;
     if (snapshotKey !== this.lastSnapshot) {
       this.lastSnapshot = snapshotKey;
-      this.options.onSnapshot({ phase: fishing.kind, caught: caught.length, lastFish: caught.at(-1) ?? null });
+      this.options.onSnapshot({ phase: fishing.kind, caught: caught.length, lastFish: caught.at(-1) ?? null, counts: countCatches(caught) });
     }
     const attributes = `${fishing.kind}|${position[0].toFixed(2)}|${position[1].toFixed(2)}|${caught.length}`;
     if (attributes !== this.lastAttributes) {

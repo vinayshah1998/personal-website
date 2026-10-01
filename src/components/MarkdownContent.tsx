@@ -10,7 +10,7 @@ interface MarkdownContentProps {
 
 export default function MarkdownContent({ content }: MarkdownContentProps) {
   return (
-    <div className="prose prose-lg dark:prose-invert max-w-none">
+    <div className="prose prose-lg prose-cozy max-w-none">
       <ReactMarkdown
         components={{
           code({ className, children }) {

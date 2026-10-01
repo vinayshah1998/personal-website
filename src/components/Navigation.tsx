@@ -23,10 +23,9 @@ const Navigation = () => {
           <Link
             key={item.name}
             href={item.href}
-            className={`inline-flex min-h-11 items-center whitespace-nowrap md:min-h-0 text-sm transition-colors hover:text-gray-900 dark:hover:text-gray-100 ${
-              isActive
-                ? 'text-gray-900 dark:text-gray-100'
-                : 'text-gray-600 dark:text-gray-400'
+            aria-current={isActive ? 'page' : undefined}
+            className={`inline-flex min-h-11 items-center whitespace-nowrap md:min-h-0 text-sm transition-colors hover:text-forest ${
+              isActive ? 'text-ink font-semibold underline decoration-saffron decoration-2 underline-offset-8' : 'text-ink-soft'
             }`}
           >
             {item.name}

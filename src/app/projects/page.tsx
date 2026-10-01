@@ -3,33 +3,34 @@ import { projects } from '@/lib/projects';
 export default function Projects() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">
-      <h1 className="text-4xl font-bold mb-8 text-gray-900 dark:text-gray-100">
+      <p className="page-kicker">Things I built</p>
+      <h1 className="page-title mb-8">
         Projects
       </h1>
-      <p className="text-lg text-gray-600 dark:text-gray-400 mb-12 leading-relaxed">
+      <p className="page-lede mb-10">
         Here are some of the projects I've worked on. Each one represents a learning 
         journey and an opportunity to solve interesting problems.
       </p>
       
-      <div className="space-y-12">
+      <div className="space-y-6">
         {projects.map((project) => (
-          <div key={project.id} className="border-b border-gray-200 dark:border-gray-800 pb-12 last:border-b-0">
-            <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+          <div key={project.id} className="cozy-card p-6">
+            <h2 className="font-display text-2xl font-bold mb-3 text-ink">
               {project.title}
             </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-4 leading-relaxed">
+            <p className="text-ink-soft mb-4 leading-relaxed">
               {project.description}
             </p>
             
             <div className="mb-4">
-              <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
+              <h3 className="text-sm font-medium text-ink mb-2">
                 Technologies Used
               </h3>
               <div className="flex flex-wrap gap-2">
                 {project.tech.map((tech) => (
                   <span 
                     key={tech}
-                    className="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full"
+                    className="cozy-tag"
                   >
                     {tech}
                   </span>
@@ -42,7 +43,7 @@ export default function Projects() {
                 href={project.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
+                className="cozy-link text-sm"
               >
                 View Code →
               </a>
@@ -51,7 +52,7 @@ export default function Projects() {
                   href={project.demo}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
+                  className="cozy-link text-sm"
                 >
                   Live Demo →
                 </a>
@@ -61,17 +62,17 @@ export default function Projects() {
         ))}
       </div>
       
-      <div className="mt-16 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg">
-        <h2 className="text-xl font-semibold mb-3 text-gray-900 dark:text-gray-100">
+      <div className="mt-12 p-6 cozy-card bg-chip">
+        <h2 className="font-display text-xl font-bold mb-3 text-ink">
           Want to collaborate?
         </h2>
-        <p className="text-gray-600 dark:text-gray-400 mb-4">
+        <p className="text-ink-soft mb-4">
           I'm always open to working on interesting projects. If you have an idea 
           or want to collaborate, let's chat!
         </p>
         <a 
           href="mailto:vinayshah2006@gmail.com"
-          className="text-blue-600 dark:text-blue-400 hover:underline"
+          className="cozy-link"
         >
           Get in touch →
         </a>

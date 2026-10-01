@@ -35,14 +35,31 @@ interface Circle {
   readonly radius: number;
 }
 
-export const FISH: Readonly<Record<FishKind, { readonly name: string; readonly weight: number }>> = {
-  minnow: { name: 'a pond minnow', weight: 5 },
-  goby: { name: 'a tiny goby', weight: 4 },
-  trout: { name: 'a speckled trout', weight: 3 },
-  koi: { name: 'a sunset koi', weight: 2 },
-  moonCarp: { name: 'a moon carp', weight: 1 },
-  lilyLeaf: { name: 'a lily leaf (it counts)', weight: 1 },
+export interface FishInfo {
+  /** Used in a sentence: "You caught a sunset koi!" */
+  readonly name: string;
+  /** Used on its own, as in the basket. */
+  readonly label: string;
+  readonly weight: number;
+  readonly color: string;
+}
+
+export const FISH: Readonly<Record<FishKind, FishInfo>> = {
+  minnow: { name: 'a pond minnow', label: 'Pond minnow', weight: 5, color: '#9fb8cc' },
+  goby: { name: 'a tiny goby', label: 'Tiny goby', weight: 4, color: '#d2a86c' },
+  trout: { name: 'a speckled trout', label: 'Speckled trout', weight: 3, color: '#8fb07c' },
+  koi: { name: 'a sunset koi', label: 'Sunset koi', weight: 2, color: '#f2894b' },
+  moonCarp: { name: 'a moon carp', label: 'Moon carp', weight: 1, color: '#ece6f7' },
+  lilyLeaf: { name: 'a lily leaf (it counts)', label: 'Lily leaf', weight: 1, color: '#6ab26b' },
 };
+
+export const FISH_KINDS = Object.keys(FISH) as FishKind[];
+
+export function countCatches(caught: readonly FishKind[]): Partial<Record<FishKind, number>> {
+  const counts: Partial<Record<FishKind, number>> = {};
+  for (const fish of caught) counts[fish] = (counts[fish] ?? 0) + 1;
+  return counts;
+}
 
 export const LAYOUT = {
   islandRadius: 9.2,

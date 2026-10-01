@@ -16,12 +16,13 @@ export default function Error({
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4 text-gray-900 dark:text-gray-100">
+        <p className="page-kicker">Miles on Strava</p>
+        <h1 className="page-title mb-4">
           Running Stats
         </h1>
       </div>
 
-      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6">
+      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-[18px] p-6">
         <h2 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
           Something went wrong
         </h2>

@@ -11,29 +11,30 @@ export default function BlogPage() {
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-16">
-      <h1 className="text-4xl font-bold mb-8">Blog</h1>
+      <p className="page-kicker">Notes &amp; fixes</p>
+      <h1 className="page-title mb-8">Blog</h1>
 
       {posts.length === 0 ? (
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-ink-soft">
           No blog posts yet. Check back soon!
         </p>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {posts.map((post) => (
             <article
               key={post.slug}
-              className="border-b border-gray-200 dark:border-gray-800 pb-8 last:border-0"
+              className="cozy-card p-6"
             >
               <Link
                 href={`/blog/${post.slug}`}
                 className="group"
               >
-                <h2 className="text-2xl font-bold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                <h2 className="font-display text-2xl font-bold mb-2 text-ink group-hover:text-forest transition-colors">
                   {post.title}
                 </h2>
               </Link>
 
-              <div className="flex items-center gap-4 mb-3 text-sm text-gray-600 dark:text-gray-400">
+              <div className="flex items-center gap-4 mb-3 text-sm text-ink-soft">
                 <time dateTime={post.date}>
                   {new Date(post.date).toLocaleDateString('en-US', {
                     year: 'numeric',
@@ -47,7 +48,7 @@ export default function BlogPage() {
                     {post.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs"
+                        className="cozy-tag"
                       >
                         {tag}
                       </span>
@@ -56,13 +57,13 @@ export default function BlogPage() {
                 )}
               </div>
 
-              <p className="text-gray-700 dark:text-gray-300 mb-4">
+              <p className="text-ink-soft mb-4 leading-relaxed">
                 {post.excerpt}
               </p>
 
               <Link
                 href={`/blog/${post.slug}`}
-                className="text-blue-600 dark:text-blue-400 hover:underline"
+                className="cozy-link"
               >
                 Read more →
               </Link>
