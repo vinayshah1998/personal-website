@@ -13,6 +13,10 @@ interface StravaActivity {
   total_elevation_gain: number;
   type: string;
   start_date: string;
+  /** The start in the athlete's local time, written as if it were UTC. */
+  start_date_local: string;
+  /** Such as "(GMT-08:00) America/Los_Angeles". */
+  timezone?: string;
   average_speed?: number;
   max_speed?: number;
 }
@@ -41,6 +45,11 @@ interface StravaStats {
   };
 }
 
+// Overridable so end-to-end tests can point the site at a local mock.
+const STRAVA = process.env.STRAVA_BASE_URL ?? 'https://www.strava.com';
+const PAGE = 200;
+const MAX_PAGES = 10;
+
 class StravaAPI {
   private clientId: string;
   private clientSecret: string;
@@ -65,7 +74,7 @@ class StravaAPI {
 
     console.log('Refreshing Strava access token...');
     
-    const response = await fetch('https://www.strava.com/oauth/token', {
+    const response = await fetch(`${STRAVA}/oauth/token`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -96,9 +105,9 @@ class StravaAPI {
   private async makeRequest(endpoint: string) {
     const token = await this.refreshAccessToken();
     
-    console.log(`Making request to: https://www.strava.com/api/v3${endpoint}`);
+    console.log(`Making request to: ${STRAVA}/api/v3${endpoint}`);
     
-    const response = await fetch(`https://www.strava.com/api/v3${endpoint}`, {
+    const response = await fetch(`${STRAVA}/api/v3${endpoint}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -123,8 +132,18 @@ class StravaAPI {
     return this.makeRequest(`/athletes/${athleteId}/stats`);
   }
 
-  async getRecentActivities(limit = 10, after?: number): Promise<StravaActivity[]> {
-    return this.makeRequest(`/athlete/activities?per_page=${limit}${after ? `&after=${after}` : ''}`);
+  /**
+   * Every activity that started after `after` (epoch seconds), paging 200 at a time. Capped at 10 pages, which is
+   * 2,000 activities and well inside Strava's 100 reads per 15 minutes at the stats page's 10-minute revalidation.
+   */
+  async getActivitiesSince(after: number): Promise<StravaActivity[]> {
+    const all: StravaActivity[] = [];
+    for (let page = 1; page <= MAX_PAGES; page++) {
+      const batch: StravaActivity[] = await this.makeRequest(`/athlete/activities?per_page=${PAGE}&page=${page}&after=${after}`);
+      all.push(...batch);
+      if (batch.length < PAGE) break;
+    }
+    return all;
   }
 }
 

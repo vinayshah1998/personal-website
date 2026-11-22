@@ -9,11 +9,9 @@ export const revalidate = 600;
 async function getStravaData() {
   const now = Date.now();
   try {
-    const twelveWeeksAgo = Math.floor(now / 1000) - 12 * 7 * 24 * 3600;
-    const [stats, activities] = await Promise.all([
-      stravaAPI.getAthleteStats(),
-      stravaAPI.getRecentActivities(200, twelveWeeksAgo),
-    ]);
+    // From a day before last New Year's (UTC), so runs that are early on Jan 1 in the athlete's zone still count.
+    const after = Date.UTC(new Date(now).getUTCFullYear() - 1, 0, 1) / 1000 - 86_400;
+    const [stats, activities] = await Promise.all([stravaAPI.getAthleteStats(), stravaAPI.getActivitiesSince(after)]);
     return { stats, activities, now };
   } catch (error) {
     console.error('Failed to fetch Strava data:', error);
@@ -25,7 +23,7 @@ export default async function StatsPage() {
   const data = await getStravaData();
 
   return (
-    <div className="bd">
+    <div className="bd stats">
       {data ? (
         <StravaStats stats={data.stats} activities={data.activities} now={data.now} />
       ) : (

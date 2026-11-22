@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { activities } from './strava-mock.mjs';
 
 const shots = process.env.E2E_SHOTS ?? '.audit/screens';
 const PAGES = ['about', 'projects', 'blog', 'stats'];
@@ -192,4 +193,57 @@ test('touch: drags paint in every direction, taps stamp ink, and nothing scrolls
   await expect(page).toHaveURL(/\/about\/$/);
   await expect(page.getByText('software engineer.')).toBeVisible();
   expect(errors).toEqual([]);
+});
+
+/** Painted pixels on a chart's main canvas. */
+const painted = (page: Page, chart: string) =>
+  page.locator(`${chart} canvas:not(.glow)`).evaluate((cv: HTMLCanvasElement) => {
+    const d = cv.getContext('2d')!.getImageData(0, 0, cv.width, cv.height).data;
+    let n = 0;
+    for (let i = 3; i < d.length; i += 4) if (d[i]) n++;
+    return n;
+  });
+
+test('stats charts every run this year and last, from every page of activities', async ({ page, isMobile }, testInfo) => {
+  const errors = trackErrors(page);
+  await page.goto('/stats/');
+  // The mock serves about 600 activities, three pages' worth; this year's total only comes out right with all of them.
+  const year = activities().at(-1)!.start_date_local.slice(0, 4);
+  const miles = (y: string) =>
+    activities()
+      .filter((a) => a.type === 'Run' && a.start_date_local.startsWith(y))
+      .reduce((s, a) => s + a.distance * 0.000621371, 0);
+  const area = page.locator('.chart.area');
+  const label = (await area.getAttribute('aria-label'))!;
+  const [thisYear, lastYear] = label.split('. In ').map((part) => part.split(': ')[1].split(', ').map(Number));
+  expect(thisYear.at(-1)).toBeCloseTo(miles(year), 1);
+  expect(lastYear).toHaveLength(12);
+  expect(lastYear.at(-1)).toBeCloseTo(miles(String(Number(year) - 1)), 1);
+
+  // The headline counts up to this year's miles, and both charts draw in.
+  await expect(page.locator('.big')).toHaveText(`${miles(year).toFixed(1)} mi`);
+  await expect.poll(() => painted(page, '.chart:not(.area)')).toBeGreaterThan(2000);
+  await expect.poll(() => painted(page, '.chart.area')).toBeGreaterThan(2000);
+  await page.screenshot({ path: `${shots}/${testInfo.project.name}-stats.png` });
+
+  // Hover or tap the first bar: the tooltip moves to that week.
+  const first = (await page.locator('.ax span').first().textContent())!.replace('week of ', '');
+  const bars = (await page.locator('.chart:not(.area)').boundingBox())!;
+  const tip = page.locator('.chart:not(.area) .tip');
+  await expect(tip).toHaveText(/ mi$/);
+  await expect(tip).not.toHaveText(new RegExp(`^${first} `));
+  if (isMobile) await page.touchscreen.tap(bars.x + 10, bars.y + bars.height / 2);
+  else await page.mouse.move(bars.x + 10, bars.y + bars.height / 2);
+  await expect(tip).toHaveText(new RegExp(`^${first} `));
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+  expect(errors).toEqual([]);
+});
+
+test('under reduced motion the stats charts and headline appear at once', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/stats/');
+  const final = await page.locator('.big').textContent();
+  await page.waitForTimeout(50);
+  expect(await page.locator('.big').textContent()).toBe(final);
+  expect(await painted(page, '.chart.area')).toBeGreaterThan(2000);
 });
