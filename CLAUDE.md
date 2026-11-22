@@ -17,11 +17,11 @@ This is a Next.js 15 personal website using the App Router architecture with the
 - **Framework**: Next.js 15 with React 19
 - **Styling**: TailwindCSS 4 with dark mode support via CSS classes
 - **TypeScript**: Strict mode enabled with path aliases (`@/*` → `./src/*`)
-- **Font**: Inter font loaded via `next/font/google`
+- **Font**: Departure Mono (OFL), self-hosted from `src/fonts/` via `next/font/local` and preloaded; 12px, 11px under 480px wide
 - **Analytics**: Vercel Speed Insights and Analytics integration
 
 ### Page Structure (App Router)
-- `/` - Homepage with personal introduction and recent projects preview
+- `/` - Homepage: full-screen ink with the name, local clock, and nav
 - `/about` - About page
 - `/projects` - Projects showcase (pulls from shared data)
 - `/blog` - Blog listing page
@@ -31,23 +31,20 @@ This is a Next.js 15 personal website using the App Router architecture with the
 ### Component Architecture
 
 #### Layout System
-- **Root Layout** (`src/app/layout.tsx`): Defines site-wide structure with header, navigation, footer, and metadata
-- **Header**: Fixed header with name/logo and Navigation component
-- **Footer**: Consistent footer across all pages
-- **Client Components**: Marked with `'use client'` directive (Navigation, StravaStats)
+- **Root Layout** (`src/app/layout.tsx`): metadata, an inline script that sets the time-of-day ground color before first paint, the `Ink` component, and `<main data-scr>` for page content
+- **Ink** (`src/components/Ink.tsx`, client): one canvas for the whole site that persists across client-side navigation. On `/` it fills the first screen (100svh) with the name, local clock, and nav; on every other page it folds into a band at the top with the name and nav (Horizon). It also decodes text in (`[data-scr]`) on each page change. Palette keyframes live in `src/lib/ink.ts`
+- Elements with class `m` are no-ink zones on the canvas
 
 #### Shared Components (`src/components/`)
-- **Navigation**: Client-side navigation with active state highlighting using `usePathname()`
-- **Footer**: Site footer with links and copyright
-- **StravaStats**: Client component for displaying Strava fitness data
-- **MarkdownContent**: Renders markdown content with syntax highlighting
+- **StravaStats**: Year-to-date totals, a 12-week text bar chart, and the latest run
+- **MarkdownContent**: Renders blog markdown in the plain `.doc` style
 
 ### Data Layer (`src/lib/`)
 
 #### Projects (`src/lib/projects.ts`)
 - **Centralized Data Source**: Single source of truth for all projects
 - **Type-Safe**: TypeScript interface (`Project`) defines structure
-- **Shared Access**: Imported by both homepage (latest 2) and projects page (all)
+- **Shared Access**: Imported by the projects page; `summary` is the one line shown there
 - **Usage Pattern**: Homepage truncates descriptions to 200 chars and shows max 4 tech tags
 
 #### Blog System (`src/lib/blog.ts`)
@@ -93,22 +90,10 @@ Required for Strava integration:
 Stored in `.env.local` (not committed to repo).
 
 ### Styling Patterns
-
-#### Dark Mode
-- Implemented using Tailwind's `dark:` prefix classes
-- Background: `bg-white dark:bg-gray-900`
-- Text: `text-gray-900 dark:text-gray-100`
-- Borders: `border-gray-200 dark:border-gray-800`
-
-#### Responsive Design
-- Mobile-first approach with responsive breakpoints
-- Navigation adapts spacing: `gap-4 md:gap-8`
-- Max width container: `max-w-4xl mx-auto px-6` used consistently
-
-#### Typography
-- Headings: Size scale from `text-4xl` (h1) to `text-2xl` (h2)
-- Body text: `text-gray-600 dark:text-gray-400` for secondary content
-- Links: `text-blue-600 dark:text-blue-400 hover:underline`
+- Plain CSS classes in `src/app/globals.css` (Tailwind is imported for its reset)
+- Colors come from the visitor's local time via `--bg` and `--fg`; there is no separate dark mode
+- Subpage content: `<div className="bd">` with `.row` blocks (a `.dim` label, then text); secondary text uses `.dim`
+- Links use `.lk` (44px tall in the nav)
 
 ### Key Technical Details
 
@@ -133,7 +118,7 @@ Stored in `.env.local` (not committed to repo).
 #### Adding New Projects
 1. Add project object to `src/lib/projects.ts` array
 2. Include all required fields: id, title, description, tech, link, demo
-3. Homepage automatically displays latest 2 projects
+3. Include a one-line `summary` for the projects page
 4. Projects page shows all projects
 
 #### Adding New Blog Posts
@@ -144,9 +129,8 @@ Stored in `.env.local` (not committed to repo).
 
 #### Creating New Pages
 1. Add `page.tsx` in appropriate `src/app/` subdirectory
-2. Follow layout pattern: `max-w-4xl mx-auto px-6 py-16` container
-3. Use consistent heading styles and dark mode support
-4. Update Navigation component in `src/components/Navigation.tsx` if needed
+2. Wrap content in `<div className="bd">` with `.row` blocks
+3. Add it to `PAGES` in `src/components/Ink.tsx` if it belongs in the nav
 
 #### API Integration Pattern
 1. Create lib file with API client logic (like `strava.ts`)

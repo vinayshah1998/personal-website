@@ -1,134 +1,67 @@
 import type { StravaStats, StravaActivity } from '@/lib/strava';
 
 const METERS_TO_MILES = 0.000621371;
+const WEEK = 7 * 24 * 3600 * 1000;
 
-const formatDistance = (meters: number) => (meters * METERS_TO_MILES).toFixed(1);
+const miles = (meters: number) => (meters * METERS_TO_MILES).toFixed(1);
+const duration = (seconds: number) => `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
 
-interface StatsCardProps {
-  title: string;
-  count: number;
-  distance: number;
-  time: number;
-  elevation: number;
+/** Weekly running miles as a six-row text chart, oldest week first. */
+function bars(weeks: number[]) {
+  const max = Math.max(...weeks, 1);
+  const height = 6;
+  const out: string[] = [];
+  for (let r = height; r >= 1; r--) {
+    out.push(weeks.map((w) => {
+      const level = (w / max) * height;
+      return level >= r ? '##' : level >= r - 0.5 ? '..' : '  ';
+    }).join(' '));
+  }
+  return out.join('\n');
 }
-
-const StatsCard = ({ title, count, distance, time, elevation }: StatsCardProps) => {
-  const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return `${hours}h ${minutes}m`;
-  };
-
-  return (
-    <div className="cozy-card p-6">
-      <h3 className="font-display text-xl font-bold mb-4 text-ink">
-        {title}
-      </h3>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <p className="text-2xl font-bold text-pond">
-            {count}
-          </p>
-          <p className="text-sm text-ink-soft">Activities</p>
-        </div>
-        <div>
-          <p className="text-2xl font-bold text-forest">
-            {formatDistance(distance)} mi
-          </p>
-          <p className="text-sm text-ink-soft">Distance</p>
-        </div>
-        <div>
-          <p className="text-2xl font-bold text-berry">
-            {formatTime(time)}
-          </p>
-          <p className="text-sm text-ink-soft">Time</p>
-        </div>
-        <div>
-          <p className="text-2xl font-bold text-saffron">
-            {Math.round(elevation)} m
-          </p>
-          <p className="text-sm text-ink-soft">Elevation</p>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const RecentActivity = ({ activity }: { activity: StravaActivity }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
-  return (
-    <div className="flex justify-between items-center py-3 border-b border-line last:border-b-0">
-      <div>
-        <h4 className="font-medium text-ink">
-          {activity.name}
-        </h4>
-        <p className="text-sm text-ink-soft">
-          {formatDate(activity.start_date)} • {activity.type}
-        </p>
-      </div>
-      <div className="text-right">
-        <p className="font-semibold text-ink">
-          {formatDistance(activity.distance)} mi
-        </p>
-        <p className="text-sm text-ink-soft">
-          {Math.round(activity.moving_time / 60)} min
-        </p>
-      </div>
-    </div>
-  );
-};
 
 interface StravaStatsProps {
   stats: StravaStats;
+  /** Activities from about the last 12 weeks. */
   activities: StravaActivity[];
+  now: number;
 }
 
-export default function StravaStats({ stats, activities }: StravaStatsProps) {
+export default function StravaStats({ stats, activities, now }: StravaStatsProps) {
+  const runs = activities
+    .filter((a) => a.type === 'Run')
+    .sort((a, b) => Date.parse(b.start_date) - Date.parse(a.start_date));
+  const weeks = Array<number>(12).fill(0);
+  for (const run of runs) {
+    const week = 11 - Math.floor((now - Date.parse(run.start_date)) / WEEK);
+    if (week >= 0 && week < 12) weeks[week] += run.distance * METERS_TO_MILES;
+  }
+  const ytd = stats.ytd_run_totals;
+  const latest = runs[0];
 
   return (
-    <div className="space-y-8">
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <StatsCard
-          title="Last 4 Weeks"
-          count={stats.recent_run_totals.count}
-          distance={stats.recent_run_totals.distance}
-          time={stats.recent_run_totals.moving_time}
-          elevation={stats.recent_run_totals.elevation_gain}
-        />
-        <StatsCard
-          title="This Year"
-          count={stats.ytd_run_totals.count}
-          distance={stats.ytd_run_totals.distance}
-          time={stats.ytd_run_totals.moving_time}
-          elevation={stats.ytd_run_totals.elevation_gain}
-        />
-        <StatsCard
-          title="All Time"
-          count={stats.all_run_totals.count}
-          distance={stats.all_run_totals.distance}
-          time={stats.all_run_totals.moving_time}
-          elevation={stats.all_run_totals.elevation_gain}
-        />
+    <>
+      <div className="row">
+        <span className="dim">{new Date(now).getFullYear()} so far</span>
+        <span className="big">{miles(ytd.distance)} mi</span>
+        <span>
+          {ytd.count} runs, {duration(ytd.moving_time)}, {Math.round(ytd.elevation_gain).toLocaleString('en-US')} m climbed
+        </span>
       </div>
-
-      {activities.length > 0 && (
-        <div className="cozy-card p-6">
-          <h3 className="font-display text-xl font-bold mb-4 text-ink">
-            Recent Activities
-          </h3>
-          <div className="space-y-0">
-            {activities.map((activity) => (
-              <RecentActivity key={activity.id} activity={activity} />
-            ))}
-          </div>
+      <div className="row">
+        <span className="dim">last 12 weeks</span>
+        <pre className="bars" aria-label={`Weekly miles, oldest first: ${weeks.map((w) => w.toFixed(1)).join(', ')}`}>
+          {bars(weeks)}
+        </pre>
+      </div>
+      {latest && (
+        <div className="row">
+          <span className="dim">latest</span>
+          <span>
+            {latest.name.toLowerCase()}, {miles(latest.distance)} mi in {duration(latest.moving_time)}
+          </span>
         </div>
       )}
-    </div>
+    </>
   );
 }

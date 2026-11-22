@@ -1,16 +1,24 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import Link from "next/link";
+import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 import "./globals.css";
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
+import Ink from "@/components/Ink";
+import { KEYFRAMES, PALETTE_JS } from "@/lib/ink";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
+// Departure Mono, OFL licensed (see src/fonts/DepartureMono-LICENSE.txt), self-hosted and preloaded.
+const departureMono = localFont({
+  src: "../fonts/DepartureMono-Regular.woff2",
+  variable: "--font-dm",
+  display: "block",
+  preload: true,
 });
+
+// Before first paint: the ground and text colors for the visitor's local time, and (unless they reduce motion)
+// hide the text that is about to decode in. The class is removed when decoding starts, or after 3s regardless.
+const themeScript = `(function(){try{var d=new Date(),r=document.documentElement,p=(${PALETTE_JS})(d.getHours()+d.getMinutes()/60,${JSON.stringify(KEYFRAMES)});
+r.style.setProperty('--bg',p[0]);r.style.setProperty('--fg',p[1]);
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches){r.classList.add('scr-wait');setTimeout(function(){r.classList.remove('scr-wait')},3000)}}catch(e){}})()`;
 
 export const metadata: Metadata = {
   title: "Vinay Shah's Website",
@@ -34,30 +42,25 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.className}>
-      <body className="antialiased">
-        <div className="min-h-screen flex flex-col">
-          <header className="py-6 border-b border-line bg-paper">
-            <div className="max-w-4xl mx-auto px-6 flex flex-wrap justify-between items-center gap-x-6 gap-y-2">
-              <Link href="/">
-                <h1 className="font-display text-xl font-bold whitespace-nowrap text-ink hover:text-forest transition-colors cursor-pointer">
-                  Vinay Shah
-                </h1>
-              </Link>
-              <Navigation />
-            </div>
-          </header>
-          <main className="flex-1">
-            {children}
-          </main>
-          <Footer />
-        </div>
+    <html lang="en" className={departureMono.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
+      <body>
+        <Ink />
+        <main data-scr>{children}</main>
         <Analytics />
       </body>
       <SpeedInsights />

@@ -1,6 +1,8 @@
 export interface Project {
   id: number;
   title: string;
+  /** One line for the projects page. */
+  summary: string;
   description: string;
   tech: string[];
   link: string;
@@ -11,6 +13,7 @@ export const projects: Project[] = [
   {
     id: 1,
     title: "LLM Time Blocker",
+    summary: "A Chrome extension that blocks distracting sites until you convince a Claude gatekeeper to let you in.",
     description: "A Chrome extension that blocks distracting websites and requires users to convince an AI gatekeeper for temporary access. When navigating to a blocked site, users are redirected to a chat interface where they must persuade a Claude-powered LLM to grant a 30-minute access window. Built with a Node.js/Express backend featuring JWT authentication, Stripe subscriptions, and PostgreSQL for persistence.",
     tech: ["TypeScript", "Chrome Extension", "Node.js", "Express", "PostgreSQL", "Prisma", "Claude API"],
     link: "https://github.com/vinayshah1998/llm_time_blocker",
@@ -19,6 +22,7 @@ export const projects: Project[] = [
   {
     id: 2,
     title: "Locus Hackathon",
+    summary: "Claude agents that negotiate and settle payments on your behalf, with configurable personalities.",
     description: "An AI-powered payment negotiation system where personalized Claude agents negotiate and handle payments on behalf of users. Agents can seek payments owed to their user or pay debts, each with configurable negotiation personalities. Features a centralized credit-checking API for assessing agent reliability and implements the x402 machine-readable payment protocol for agent-to-agent transactions.",
     tech: ["Python", "Claude Agent SDK", "Locus", "x402 Protocol"],
     link: "https://github.com/vinayshah1998/locus_hackathon",
@@ -27,6 +31,7 @@ export const projects: Project[] = [
   {
     id: 3,
     title: "LuckyNumber",
+    summary: "A privacy-focused iOS app that calls a random contact. Startup went from 3s to under 100ms.",
     description: "A privacy-focused iOS app that randomly selects contacts and initiates phone calls with a \"lucky number\" twist. Features multiple selection algorithms including random, weighted-by-frequency, and recency-based strategies. Optimized for 2000+ contacts with background processing and lazy loading, reducing startup time from 3 seconds to under 100ms. Fully supports iOS 18's limited contacts access feature.",
     tech: ["Swift", "SwiftUI", "iOS 18", "MVVM", "Async/Await", "Contacts Framework"],
     link: "https://github.com/vinayshah1998/LuckyNumber",

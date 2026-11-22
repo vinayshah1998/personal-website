@@ -52,13 +52,13 @@ class StravaAPI {
     this.clientId = process.env.STRAVA_CLIENT_ID!;
     this.clientSecret = process.env.STRAVA_CLIENT_SECRET!;
     this.refreshToken = process.env.STRAVA_REFRESH_TOKEN!;
-
-    if (!this.clientId || !this.clientSecret || !this.refreshToken) {
-      throw new Error('Missing Strava API credentials');
-    }
   }
 
   private async refreshAccessToken(): Promise<string> {
+    // Checked per request rather than at import, so builds without credentials still render the stats page's fallback.
+    if (!this.clientId || !this.clientSecret || !this.refreshToken) {
+      throw new Error('Missing Strava API credentials');
+    }
     if (this.accessToken && Date.now() < this.tokenExpiresAt * 1000) {
       return this.accessToken;
     }
@@ -123,8 +123,8 @@ class StravaAPI {
     return this.makeRequest(`/athletes/${athleteId}/stats`);
   }
 
-  async getRecentActivities(limit = 10): Promise<StravaActivity[]> {
-    return this.makeRequest(`/athlete/activities?per_page=${limit}`);
+  async getRecentActivities(limit = 10, after?: number): Promise<StravaActivity[]> {
+    return this.makeRequest(`/athlete/activities?per_page=${limit}${after ? `&after=${after}` : ''}`);
   }
 }
 

@@ -8,96 +8,89 @@ export const metadata: Metadata = {
 
 export default function PrivacyPolicy() {
   return (
-    <div className="max-w-4xl mx-auto px-6 py-16">
-      <Link
-        href="/foolish-enterprises"
-        className="inline-block mb-8 cozy-link"
-      >
-        &larr; Back to Foolish Enterprises
-      </Link>
-
-      <header className="mb-8">
-        <p className="page-kicker">Foolish Enterprises</p>
-        <h1 className="page-title mb-2">
-          Privacy Policy
-        </h1>
-        <p className="text-ink-soft mb-4">LLM Time Blocker</p>
-        <span className="cozy-tag text-sm">
-          Effective Date: January 31, 2026
-        </span>
+    <div className="bd">
+      <div className="row">
+        <Link className="lk dim" href="/foolish-enterprises">
+          &larr; foolish enterprises
+        </Link>
+      </div>
+      <header className="row">
+        <span className="dim">llm time blocker</span>
+        <h1>privacy policy</h1>
+        <span className="dim">effective january 31, 2026</span>
       </header>
 
-      <div className="prose prose-cozy max-w-none">
-        <p className="text-ink-soft leading-relaxed">
+      <div className="doc">
+        <p>
           This Privacy Policy describes how LLM Time Blocker (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;the Extension&rdquo;) collects, uses, and protects your information when you use our Chrome extension and related services.
         </p>
 
-        <h2 className="font-display text-2xl font-bold mt-8 mb-4 text-ink border-b border-line pb-2">
+        <h2>
           1. Information We Collect
         </h2>
 
-        <h3 className="text-xl font-medium mt-6 mb-3 text-ink">
+        <h3>
           1.1 Account Information
         </h3>
-        <p className="text-ink-soft leading-relaxed">
+        <p>
           When you create an account, we collect:
         </p>
-        <ul className="list-disc pl-6 text-ink-soft space-y-2">
+        <ul>
           <li><strong>Email address</strong> &mdash; provided directly or via Google OAuth sign-in.</li>
           <li><strong>Password</strong> &mdash; if you register with email and password (stored as a salted hash; we never store plain-text passwords).</li>
           <li><strong>Google account profile data</strong> &mdash; limited to your email address and name when you authenticate with Google OAuth.</li>
         </ul>
 
-        <h3 className="text-xl font-medium mt-6 mb-3 text-ink">
+        <h3>
           1.2 Browsing Data Stored Locally
         </h3>
-        <p className="text-ink-soft leading-relaxed">
-          The Extension stores the following data in your browser&apos;s local storage (<code className="bg-chip px-1 py-0.5 rounded text-sm">chrome.storage.local</code>):
+        <p>
+          The Extension stores the following data in your browser&apos;s local storage (<code>chrome.storage.local</code>):
         </p>
-        <ul className="list-disc pl-6 text-ink-soft space-y-2">
+        <ul>
           <li><strong>Blocked site list</strong> &mdash; the domains you have configured to block.</li>
           <li><strong>Approval records</strong> &mdash; timestamps recording when you were granted temporary access to a blocked site.</li>
           <li><strong>Schedule configuration</strong> &mdash; time windows during which blocking is active.</li>
           <li><strong>Authentication tokens</strong> &mdash; JWT access and refresh tokens used to authenticate with our backend.</li>
         </ul>
-        <p className="text-ink-soft leading-relaxed">
+        <p>
           This data remains on your device and is not transmitted to our servers except as described below.
         </p>
 
-        <h3 className="text-xl font-medium mt-6 mb-3 text-ink">
+        <h3>
           1.3 Chat and LLM Interaction Data
         </h3>
-        <p className="text-ink-soft leading-relaxed">
+        <p>
           When you interact with the LLM gatekeeper to request access to a blocked site, the messages you type are sent to our backend server, which forwards them to a third-party LLM provider (Anthropic&apos;s Claude API) for processing. We may retain conversation logs for abuse prevention and service improvement.
         </p>
 
-        <h3 className="text-xl font-medium mt-6 mb-3 text-ink">
+        <h3>
           1.4 Payment Information
         </h3>
-        <p className="text-ink-soft leading-relaxed">
+        <p>
           Subscription payments are processed by <strong>Stripe</strong>. We do not directly collect or store your credit card number or banking details. Stripe handles all payment data in accordance with PCI-DSS standards. We receive and store only:
         </p>
-        <ul className="list-disc pl-6 text-ink-soft space-y-2">
+        <ul>
           <li>Stripe customer and subscription identifiers.</li>
           <li>Subscription status and billing period information.</li>
         </ul>
 
-        <h3 className="text-xl font-medium mt-6 mb-3 text-ink">
+        <h3>
           1.5 Technical and Usage Data
         </h3>
-        <p className="text-ink-soft leading-relaxed">
+        <p>
           Our backend server may automatically collect:
         </p>
-        <ul className="list-disc pl-6 text-ink-soft space-y-2">
+        <ul>
           <li>IP address and request metadata (for rate limiting and security).</li>
           <li>Timestamps of API requests.</li>
           <li>Error logs for debugging purposes.</li>
         </ul>
 
-        <h2 className="font-display text-2xl font-bold mt-8 mb-4 text-ink border-b border-line pb-2">
+        <h2>
           2. How We Use Your Information
         </h2>
-        <ul className="list-disc pl-6 text-ink-soft space-y-2">
+        <ul>
           <li><strong>Provide and maintain the service</strong> &mdash; authenticate your account, manage subscriptions, and process LLM requests.</li>
           <li><strong>Process payments</strong> &mdash; manage your subscription through Stripe.</li>
           <li><strong>Prevent abuse</strong> &mdash; detect and prevent misuse of the LLM gatekeeper feature.</li>
@@ -105,136 +98,128 @@ export default function PrivacyPolicy() {
           <li><strong>Communicate with you</strong> &mdash; send transactional emails related to your account or subscription.</li>
         </ul>
 
-        <h2 className="font-display text-2xl font-bold mt-8 mb-4 text-ink border-b border-line pb-2">
+        <h2>
           3. Data Sharing and Third Parties
         </h2>
-        <p className="text-ink-soft leading-relaxed">
+        <p>
           We share your data only with the following third-party services, and only to the extent necessary to provide the Extension&apos;s functionality:
         </p>
-        <ul className="list-disc pl-6 text-ink-soft space-y-2">
+        <ul>
           <li>
             <strong>Anthropic (Claude API)</strong> &mdash; receives chat messages you send to the LLM gatekeeper. Subject to{' '}
-            <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener noreferrer" className="cozy-link">
+            <a href="https://www.anthropic.com/privacy" target="_blank" rel="noopener noreferrer">
               Anthropic&apos;s Privacy Policy
             </a>.
           </li>
           <li>
             <strong>Stripe</strong> &mdash; processes subscription payments. Subject to{' '}
-            <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" className="cozy-link">
+            <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer">
               Stripe&apos;s Privacy Policy
             </a>.
           </li>
           <li>
             <strong>Google</strong> &mdash; facilitates OAuth authentication. Subject to{' '}
-            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="cozy-link">
+            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
               Google&apos;s Privacy Policy
             </a>.
           </li>
           <li>
             <strong>Railway</strong> &mdash; hosts our backend infrastructure. Subject to{' '}
-            <a href="https://railway.app/legal/privacy" target="_blank" rel="noopener noreferrer" className="cozy-link">
+            <a href="https://railway.app/legal/privacy" target="_blank" rel="noopener noreferrer">
               Railway&apos;s Privacy Policy
             </a>.
           </li>
         </ul>
-        <p className="text-ink-soft leading-relaxed">
+        <p>
           We do not sell, rent, or trade your personal information to any third party for marketing purposes.
         </p>
 
-        <h2 className="font-display text-2xl font-bold mt-8 mb-4 text-ink border-b border-line pb-2">
+        <h2>
           4. Data Retention
         </h2>
-        <ul className="list-disc pl-6 text-ink-soft space-y-2">
+        <ul>
           <li><strong>Account data</strong> is retained for as long as your account is active. You may request deletion at any time.</li>
           <li><strong>LLM conversation logs</strong> may be retained for up to 90 days for abuse prevention.</li>
           <li><strong>Local browser data</strong> is retained until you uninstall the Extension or clear it manually.</li>
           <li><strong>Payment records</strong> are retained as required by applicable tax and financial regulations.</li>
         </ul>
 
-        <h2 className="font-display text-2xl font-bold mt-8 mb-4 text-ink border-b border-line pb-2">
+        <h2>
           5. Data Security
         </h2>
-        <p className="text-ink-soft leading-relaxed">
+        <p>
           We implement appropriate technical and organizational measures to protect your data, including:
         </p>
-        <ul className="list-disc pl-6 text-ink-soft space-y-2">
+        <ul>
           <li>Encrypted data transmission over HTTPS/TLS.</li>
           <li>Hashed and salted password storage.</li>
           <li>Short-lived JWT access tokens (15 minutes) with secure refresh token rotation.</li>
           <li>Server-side rate limiting and input validation.</li>
         </ul>
-        <p className="text-ink-soft leading-relaxed">
+        <p>
           No method of electronic storage or transmission is 100% secure. While we strive to protect your information, we cannot guarantee absolute security.
         </p>
 
-        <h2 className="font-display text-2xl font-bold mt-8 mb-4 text-ink border-b border-line pb-2">
+        <h2>
           6. Chrome Extension Permissions
         </h2>
-        <p className="text-ink-soft leading-relaxed">
+        <p>
           The Extension requests the following browser permissions:
         </p>
-        <ul className="list-disc pl-6 text-ink-soft space-y-2">
+        <ul>
           <li><strong>webNavigation</strong> &mdash; to detect when you navigate to a blocked website.</li>
           <li><strong>storage</strong> &mdash; to store your blocked site list, approval records, and authentication tokens locally.</li>
           <li><strong>tabs</strong> &mdash; to redirect blocked navigations to the gatekeeper page.</li>
         </ul>
-        <p className="text-ink-soft leading-relaxed">
+        <p>
           These permissions are used solely to deliver the Extension&apos;s core blocking functionality. We do not collect or transmit your general browsing history.
         </p>
 
-        <h2 className="font-display text-2xl font-bold mt-8 mb-4 text-ink border-b border-line pb-2">
+        <h2>
           7. Your Rights
         </h2>
-        <p className="text-ink-soft leading-relaxed">
+        <p>
           Depending on your jurisdiction, you may have the right to:
         </p>
-        <ul className="list-disc pl-6 text-ink-soft space-y-2">
+        <ul>
           <li>Access the personal data we hold about you.</li>
           <li>Request correction of inaccurate data.</li>
           <li>Request deletion of your account and associated data.</li>
           <li>Export your data in a portable format.</li>
           <li>Withdraw consent for data processing where applicable.</li>
         </ul>
-        <p className="text-ink-soft leading-relaxed">
+        <p>
           To exercise any of these rights, please contact us at the email address listed below.
         </p>
 
-        <h2 className="font-display text-2xl font-bold mt-8 mb-4 text-ink border-b border-line pb-2">
+        <h2>
           8. Children&apos;s Privacy
         </h2>
-        <p className="text-ink-soft leading-relaxed">
+        <p>
           The Extension is not directed at children under 13 years of age. We do not knowingly collect personal information from children under 13. If you believe a child has provided us with personal data, please contact us so we can take appropriate action.
         </p>
 
-        <h2 className="font-display text-2xl font-bold mt-8 mb-4 text-ink border-b border-line pb-2">
+        <h2>
           9. Changes to This Policy
         </h2>
-        <p className="text-ink-soft leading-relaxed">
+        <p>
           We may update this Privacy Policy from time to time. We will notify you of material changes by posting the updated policy with a revised effective date. Your continued use of the Extension after any changes constitutes your acceptance of the updated policy.
         </p>
 
-        <h2 className="font-display text-2xl font-bold mt-8 mb-4 text-ink border-b border-line pb-2">
+        <h2>
           10. Contact Us
         </h2>
-        <p className="text-ink-soft leading-relaxed">
+        <p>
           If you have questions or concerns about this Privacy Policy or our data practices, please contact us at:
         </p>
-        <p className="text-ink-soft">
+        <p>
           <strong>Email:</strong>{' '}
-          <a href="mailto:vinayshah2006@gmail.com" className="cozy-link">
+          <a href="mailto:vinayshah2006@gmail.com">
             vinayshah2006@gmail.com
           </a>
         </p>
       </div>
 
-      <footer className="mt-12 pt-8 border-t border-line">
-        <Link
-          href="/foolish-enterprises"
-          className="cozy-link"
-        >
-          &larr; Back to Foolish Enterprises
-        </Link>
-      </footer>
     </div>
   );
 }

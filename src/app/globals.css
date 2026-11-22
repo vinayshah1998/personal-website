@@ -1,601 +1,284 @@
 @import "tailwindcss";
-@plugin "@tailwindcss/typography";
 
+/* Ground and text follow the visitor's local time; the inline script in the root layout and the ink keep these current. */
 :root {
-  /* The island palette, shared by every page. Dark mode is the same island in the evening. */
-  --paper: #fbf6ec;
-  --card: #fffaf1;
-  --line: #ecdcc3;
-  --line-strong: #e2c99f;
-  --ink: #2b3a2c;
-  --ink-soft: #5b5343;
-  --forest: #3f7d57;
-  --saffron: #b8650f;
-  --saffron-bright: #e0892a;
-  --chip: #eef3e2;
-  --chip-ink: #3f6a47;
-  --sand: #f3e3c6;
-  --sand-strong: #eed4a8;
-  --pond: #2b7c80;
-  --berry: #b44a6c;
-  --sky-glow: #fff4e2;
-  --sky-mid: #fbe9d2;
-  --sky-top: #f9d9b8;
-  --background: var(--paper);
-  --foreground: var(--ink);
+  --bg: #f3f1ea;
+  --fg: #17161b;
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-r: env(safe-area-inset-right, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-l: env(safe-area-inset-left, 0px);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #1d1914;
-    --card: #28221b;
-    --line: #3b3128;
-    --line-strong: #4b3e31;
-    --ink: #f3eadb;
-    --ink-soft: #cbbda7;
-    --forest: #93d3a3;
-    --saffron: #f2b26a;
-    --saffron-bright: #f2a95a;
-    --chip: #2c3a2e;
-    --chip-ink: #cfe6d3;
-    --sand: #3a3027;
-    --sand-strong: #4a3d31;
-    --pond: #7fcfd0;
-    --berry: #ee9ab4;
-    --sky-glow: #4a3a33;
-    --sky-mid: #2e2520;
-    --sky-top: #1d1914;
-  }
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-paper: var(--paper);
-  --color-card: var(--card);
-  --color-line: var(--line);
-  --color-line-strong: var(--line-strong);
-  --color-ink: var(--ink);
-  --color-ink-soft: var(--ink-soft);
-  --color-forest: var(--forest);
-  --color-saffron: var(--saffron);
-  --color-chip: var(--chip);
-  --color-chip-ink: var(--chip-ink);
-  --color-sand: var(--sand);
-  --color-pond: var(--pond);
-  --color-berry: var(--berry);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, ui-serif, serif;
+/* No pinch zoom or sideways panning anywhere; the homepage goes further with touch-action none. */
+html {
+  background: var(--bg);
+  color: var(--fg);
+  touch-action: pan-y;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-/* Small building blocks so the inner pages match the island. */
-@layer components {
-  .page-kicker {
-    font: 600 0.8rem/1.2 ui-sans-serif, system-ui, sans-serif;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--forest);
-    margin-bottom: 0.75rem;
-  }
-
-  .page-title {
-    font-family: var(--font-display);
-    font-size: clamp(2.4rem, 5vw, 3.4rem);
-    line-height: 1.05;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--ink);
-  }
-
-  .page-lede {
-    margin-top: 1rem;
-    font-size: 1.15rem;
-    line-height: 1.6;
-    color: var(--ink-soft);
-  }
-
-  .cozy-card {
-    border-radius: 18px;
-    background: var(--card);
-    border: 1px solid var(--line);
-    box-shadow: 0 3px 0 var(--line-strong);
-  }
-
-  .cozy-tag {
-    display: inline-block;
-    padding: 0.2rem 0.6rem;
-    font-size: 0.72rem;
-    border-radius: 999px;
-    background: var(--chip);
-    color: var(--chip-ink);
-  }
-
-  .cozy-link {
-    color: var(--forest);
-    font-weight: 600;
-  }
-
-  .cozy-link:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
-  }
-}
-
-/* Typography plugin colors, unlayered so they win over its defaults. */
-.prose-cozy {
-  --tw-prose-body: var(--ink-soft);
-  --tw-prose-headings: var(--ink);
-  --tw-prose-lead: var(--ink-soft);
-  --tw-prose-links: var(--forest);
-  --tw-prose-bold: var(--ink);
-  --tw-prose-counters: var(--ink-soft);
-  --tw-prose-bullets: var(--line-strong);
-  --tw-prose-hr: var(--line);
-  --tw-prose-quotes: var(--ink);
-  --tw-prose-quote-borders: var(--line-strong);
-  --tw-prose-captions: var(--ink-soft);
-  --tw-prose-code: var(--ink);
-  --tw-prose-pre-code: #f3eadb;
-  --tw-prose-pre-bg: #2b2620;
-  --tw-prose-th-borders: var(--line-strong);
-  --tw-prose-td-borders: var(--line);
-}
-
-.prose-cozy :where(h1, h2, h3) {
-  font-family: var(--font-display);
-}
-
-/* Desktop: words and controls on the left, the island alone on the right, so nothing covers it. */
-.island-hero {
-  --gutter: clamp(1.25rem, 5vw, 4rem);
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(19rem, 2fr) minmax(0, 3fr);
-  grid-template-rows: auto 1fr;
-  column-gap: clamp(0.5rem, 2vw, 2rem);
-  min-height: min(92vh, 900px);
-  padding-bottom: clamp(1rem, 3vw, 2.5rem);
-  background: radial-gradient(120% 90% at 70% 30%, var(--sky-glow) 0%, var(--sky-mid) 45%, var(--sky-top) 100%);
-  overflow: hidden;
-  border-bottom: 1px solid var(--line);
+  min-height: 100svh;
+  font-family: var(--font-dm), ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* rem, so the browser's default font size setting scales the text: 12px/18px at the 16px default. */
+  font-size: 0.75rem;
+  line-height: 1.125rem;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
 }
 
-.island-intro {
-  grid-column: 1;
-  grid-row: 1;
-  padding: clamp(1.5rem, 4vw, 3.5rem) 0 0 var(--gutter);
-  max-width: 34rem;
+/* Departure Mono sits on its pixel grid at 11px (at the 16px default). */
+@media (max-width: 479px) {
+  body {
+    font-size: 0.6875rem;
+    line-height: 1.0625rem;
+  }
 }
 
-.island-kicker {
-  font: 600 0.8rem/1.2 ui-sans-serif, system-ui, sans-serif;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--forest);
-  margin-bottom: 0.75rem;
-}
-
-.island-title {
-  font-family: var(--font-display);
-  font-size: clamp(2.6rem, 6vw, 4.6rem);
-  line-height: 1;
-  font-weight: 700;
-  color: var(--ink);
-  letter-spacing: -0.02em;
-}
-
-.island-lede {
-  margin-top: 1rem;
-  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
-  line-height: 1.55;
-  color: var(--ink-soft);
-}
-
-.island-paths {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.6rem;
-  margin-top: 1.5rem;
-  max-width: 26rem;
-}
-
-.island-path {
-  display: flex;
-  flex-direction: column;
-  padding: 0.65rem 0.9rem;
-  border-radius: 14px;
-  background: color-mix(in srgb, var(--card) 85%, transparent);
-  border: 1px solid var(--line);
-  box-shadow: 0 2px 0 var(--line-strong);
-  color: var(--ink);
-  font-weight: 600;
-  transition: transform 150ms ease, box-shadow 150ms ease;
-}
-
-.island-path small {
-  font-weight: 400;
-  color: var(--ink-soft);
-  font-size: 0.78rem;
-}
-
-.island-path:hover,
-.island-path:focus-visible {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 0 var(--line-strong);
-}
-
-.island-path:focus-visible,
-.island-world:focus-visible,
-.island-controls button:focus-visible {
-  outline: 3px solid var(--saffron-bright);
-  outline-offset: 3px;
-}
-
-/* The stage's children join the hero grid directly. */
-.island-stage {
-  display: contents;
-}
-
-.island-world {
-  position: relative;
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  min-height: 32rem;
-  touch-action: pan-y;
-  cursor: pointer;
-  border-radius: 0;
-}
-
-.island-world:focus-visible {
-  outline-offset: -6px;
-  border-radius: 18px;
-}
-
-.island-canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  transition: opacity 900ms ease;
-}
-
-.island-stage[data-status='ready'] .island-canvas {
-  opacity: 1;
-}
-
-.island-speech {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
-}
-
-.island-bubble {
-  position: absolute;
-  left: clamp(8.5rem, var(--anchor-x, 50%), calc(100% - 8.5rem));
-  top: max(5.5rem, var(--anchor-y, 40%));
-  max-width: min(17rem, 70%);
-  width: max-content;
-  padding: 0.6rem 1rem 0.65rem;
-  transform: translate(-50%, calc(-100% - 14px));
-  border-radius: 22px;
-  background: #fffaf0;
-  border: 2px solid #ecd3a8;
-  box-shadow: 0 5px 0 #ecd3a8, 0 14px 28px rgba(120, 80, 30, 0.18);
-  color: #4a3524;
-  font: 600 0.95rem/1.4 ui-rounded, 'SF Pro Rounded', 'Nunito', 'Varela Round', system-ui, sans-serif;
-  text-align: center;
-  animation: island-bubble-in 280ms cubic-bezier(0.3, 1.6, 0.5, 1) both;
-}
-
-/* The tail is two plain border triangles: outline, then fill. */
-.island-bubble::before,
-.island-bubble::after {
-  content: '';
-  position: absolute;
-  left: calc(50% - 12px);
-  border-style: solid;
-  border-color: transparent;
-  border-width: 12px 12px 0;
-}
-
-.island-bubble::before {
-  bottom: -14px;
-  border-top-color: #ecd3a8;
-}
-
-.island-bubble::after {
-  bottom: -10px;
-  border-top-color: #fffaf0;
-}
-
-.island-bubble-rest {
+.scr-wait [data-scr] {
   visibility: hidden;
 }
 
-@keyframes island-bubble-in {
-  from {
-    opacity: 0;
-    transform: translate(-50%, calc(-100% - 4px)) scale(0.6);
-  }
-}
-
-.island-poster {
+.ink {
   position: absolute;
-  inset: 8%;
-  display: grid;
-  place-items: center;
-}
-
-.island-poster svg {
+  top: 0;
+  left: 0;
+  display: block;
   width: 100%;
-  height: 100%;
-  max-height: 520px;
+  height: 100svh;
+  pointer-events: none;
 }
 
-.island-stage[data-status='ready'] .island-poster {
-  display: none;
-}
-
-.island-controls {
+main,
+.site {
   position: relative;
-  z-index: 3;
-  grid-column: 1;
-  grid-row: 2;
-  align-self: start;
-  width: min(26rem, calc(100% - var(--gutter)));
-  margin: 1.5rem 0 0 var(--gutter);
-  padding: 0.9rem 1rem;
-  border-radius: 18px;
-  background: color-mix(in srgb, var(--card) 92%, transparent);
-  border: 1px solid var(--line);
-  box-shadow: 0 3px 0 var(--line-strong), 0 10px 30px rgba(120, 80, 30, 0.1);
-  color: var(--ink);
-  /* Status and the big button on the left, the d-pad beside them, the rest underneath. */
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas:
-    'status dpad'
-    'action dpad'
-    'extras extras'
-    'catches catches'
-    'help help';
-  column-gap: 0.9rem;
+  z-index: 1;
 }
 
-.island-status {
-  grid-area: status;
-  min-height: 2.6em;
-  font-size: 0.95rem;
-  line-height: 1.35;
+.dim {
+  opacity: 0.62;
 }
 
-.island-control-row {
-  display: contents;
-}
-
-.island-action {
-  grid-area: action;
-  align-self: end;
-  min-height: 2.9rem;
-  border-radius: 999px;
-  background: #3f7d57;
-  color: #fffaf0;
-  font-weight: 700;
-  box-shadow: 0 3px 0 #2c5c3f;
-  transition: transform 120ms ease;
-}
-
-.island-action:hover:not(:disabled) {
-  transform: translateY(-1px);
-}
-
-.island-action:disabled {
-  background: color-mix(in srgb, #3f7d57 45%, var(--card));
-  box-shadow: 0 3px 0 color-mix(in srgb, #2c5c3f 45%, var(--card));
-  cursor: default;
-}
-
-.island-dpad {
-  grid-area: dpad;
-  display: grid;
-  grid-template-areas: '. up .' 'left . right' '. down .';
-  grid-template-columns: repeat(3, 2.75rem);
-  grid-template-rows: repeat(3, 2.75rem);
-  gap: 0.25rem;
-}
-
-.island-dpad button {
-  border-radius: 8px;
-  background: var(--sand);
-  color: var(--ink);
-  font-size: 0.95rem;
-  line-height: 1;
-}
-
-.island-dpad button:hover:not(:disabled) {
-  background: var(--sand-strong);
-}
-
-.island-extras {
-  grid-area: extras;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.6rem;
-}
-
-.island-basket {
-  flex: 1;
-  font-weight: 600;
-  font-size: 0.85rem;
-  color: var(--saffron);
-}
-
-.island-chip {
+.lk {
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  min-height: 2rem;
-  padding: 0 0.7rem;
-  border-radius: 999px;
-  background: var(--sand);
-  color: var(--ink);
-  font-size: 0.8rem;
-  font-weight: 600;
-  box-shadow: 0 2px 0 var(--line-strong);
+  min-height: 44px;
+  padding: 0 6px;
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 2px;
 }
 
-.island-chip:hover:not(:disabled) {
-  background: var(--sand-strong);
+/* Keeps the name and nav from collapsing while their text is blanked to decode in. */
+.site .lk {
+  white-space: pre;
 }
 
-.island-chip:disabled {
-  opacity: 0.55;
-  cursor: default;
+.lk:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
 }
 
-.island-chip[aria-pressed='false'] span {
-  opacity: 0.45;
+@media (hover: hover) {
+  .lk:hover {
+    opacity: 1;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
 }
 
-.island-chip[aria-pressed='true'] {
-  background: #ffd9a0;
-  color: #4a3524;
-  box-shadow: 0 2px 0 #e9b56b;
+.lk[aria-current='page'] {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  opacity: 1;
 }
 
-/* The basket: one slot per kind of fish, a silhouette until you catch one. */
-.island-catches {
-  grid-area: catches;
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 0.3rem;
-  margin-top: 0.55rem;
+/* Homepage: the first screen is all ink. touch-action none lets drags paint in every direction. */
+.home {
+  height: 100svh;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
-.island-catch {
-  position: relative;
-  display: grid;
-  place-items: center;
-  height: 2.4rem;
-  border-radius: 10px;
-  background: var(--sand);
-  color: var(--line-strong);
-}
-
-.island-catch[data-count='0'] {
-  background: color-mix(in srgb, var(--sand) 55%, transparent);
-}
-
-.island-catch-icon {
-  display: block;
-  width: 1.9rem;
-}
-
-.island-catch-icon svg {
-  display: block;
-  width: 100%;
-  overflow: visible;
-}
-
-.island-catch-icon.is-caught svg {
-  filter: drop-shadow(0 1px 0 rgba(60, 40, 20, 0.35));
-  animation: island-catch-pop 520ms cubic-bezier(0.3, 1.8, 0.5, 1) both;
-}
-
-.island-catch-count {
+.home-name {
   position: absolute;
-  top: -0.35rem;
-  right: -0.25rem;
-  min-width: 1.15rem;
-  padding: 0 0.25rem;
-  border-radius: 999px;
-  background: #3f7d57;
-  color: #fffaf0;
-  font: 700 0.66rem/1.15rem ui-sans-serif, system-ui, sans-serif;
-  text-align: center;
+  top: calc(16px + var(--safe-t));
+  left: calc(18px + var(--safe-l));
+  font: inherit;
 }
 
-@keyframes island-catch-pop {
-  from {
-    transform: scale(0.2) rotate(-25deg);
-  }
+.home-clock {
+  position: absolute;
+  top: calc(16px + var(--safe-t));
+  right: calc(18px + var(--safe-r));
+  font-variant-numeric: tabular-nums;
 }
 
-.island-help {
-  grid-area: help;
-  margin-top: 0.45rem;
-  font-size: 0.76rem;
-  line-height: 1.4;
-  color: var(--ink-soft);
+.homenav {
+  position: absolute;
+  left: calc(12px + var(--safe-l));
+  bottom: calc(4px + var(--safe-b));
+  display: flex;
+  flex-wrap: wrap;
 }
 
-.home-content {
-  max-width: 64rem;
-  margin: 0 auto;
-  padding: 3.5rem 1.5rem 1rem;
+/* Every other page: the ink folds into a band at the top, holding the name and links. The header is in the flow,
+   so larger text wraps it onto more lines and pushes the content down instead of overlapping it. */
+.hd {
+  margin: 0 calc(12px + var(--safe-r)) 0 calc(12px + var(--safe-l));
+  padding-top: calc(2px + var(--safe-t));
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0 8px;
+}
+
+.hd nav {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.bd {
   display: grid;
-  gap: 3rem;
+  gap: 16px;
+  align-content: start;
+  max-width: 440px;
+  margin: 0 calc(18px + var(--safe-r)) 0 calc(18px + var(--safe-l));
+  /* 74px below the header puts the first line at 120px, 24px under the band. */
+  padding: 74px 0 calc(64px + var(--safe-b));
 }
 
-.home-card {
-  max-width: 44rem;
+.row {
+  display: grid;
+  gap: 2px;
+  justify-items: start;
 }
 
-.home-heading {
-  font-family: var(--font-display);
-  font-size: 1.9rem;
-  font-weight: 700;
-  color: var(--ink);
+.row .lk {
+  min-height: 0;
+  padding: 0;
 }
 
-/* Phones and narrow windows: intro, then the island, then the controls below it. */
-@media (max-width: 820px) {
-  .island-hero {
-    min-height: 0;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: none;
-    padding-bottom: 0;
-  }
-  .island-intro,
-  .island-world,
-  .island-controls {
-    grid-column: 1;
-    grid-row: auto;
-  }
-  .island-intro {
-    max-width: none;
-    padding: clamp(1.5rem, 4vw, 3.5rem) var(--gutter) 0.5rem;
-  }
-  .island-poster {
-    inset: 6%;
-  }
-  .island-controls {
-    width: auto;
-    margin: 0 0.75rem 1rem;
-  }
-  .island-world {
-    min-height: 0;
-    height: clamp(320px, 96vw, 560px);
-  }
+.inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 14px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .island-path,
-  .island-action,
-  .island-canvas {
-    transition: none;
-  }
-  .island-bubble,
-  .island-catch-icon.is-caught svg {
-    animation: none;
-  }
+.big {
+  font-size: 1.25rem;
+  line-height: 1.625rem;
+}
+
+.bars {
+  margin: 0;
+  font: inherit;
+  line-height: 0.75rem;
+  white-space: pre;
+}
+
+/* Long-form text (blog posts, the privacy policy) in the same plain mono voice. */
+.doc {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+  min-width: 0;
+}
+
+/* Grid items may shrink below their content, so wide code blocks (even inside list items) scroll instead of widening the page. */
+.doc > *,
+.doc li {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.doc h1,
+.doc h2,
+.doc h3 {
+  font: inherit;
+  margin-top: 12px;
+}
+
+.doc h1::before {
+  content: '# ';
+  opacity: 0.62;
+}
+
+.doc h2::before {
+  content: '## ';
+  opacity: 0.62;
+}
+
+.doc h3::before {
+  content: '### ';
+  opacity: 0.62;
+}
+
+.doc ul,
+.doc ol {
+  display: grid;
+  gap: 4px;
+  padding-left: 2ch;
+}
+
+.doc ul > li::before {
+  content: '- ';
+  margin-left: -2ch;
+  opacity: 0.62;
+}
+
+.doc ol {
+  list-style: decimal;
+  padding-left: 3ch;
+}
+
+.doc strong {
+  font-weight: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.doc a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.doc pre {
+  width: 100%;
+  overflow-x: auto;
+  padding: 8px 0 8px 2ch;
+  border-left: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  font: inherit;
+  overflow-wrap: normal;
+}
+
+.doc code {
+  font: inherit;
+}
+
+.doc :not(pre) > code {
+  opacity: 0.8;
+}
+
+.doc blockquote {
+  padding-left: 2ch;
+  opacity: 0.8;
+}
+
+.doc img {
+  max-width: 100%;
+  height: auto;
+}
+
+.doc hr {
+  width: 100%;
+  border: 0;
+  border-top: 1px dashed color-mix(in srgb, currentColor 40%, transparent);
 }

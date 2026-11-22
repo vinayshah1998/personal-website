@@ -46,54 +46,20 @@ export default async function BlogPostPage({ params }: PageProps) {
   }
 
   return (
-    <article className="max-w-4xl mx-auto px-6 py-16">
-      <Link
-        href="/blog"
-        className="inline-block mb-8 cozy-link"
-      >
-        ← Back to Blog
-      </Link>
-
-      <header className="mb-8">
-        <p className="page-kicker">Notes &amp; fixes</p>
-        <h1 className="page-title mb-4">{post.title}</h1>
-
-        <div className="flex items-center gap-4 text-ink-soft">
-          <time dateTime={post.date}>
-            {new Date(post.date).toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </time>
-
-          {post.tags.length > 0 && (
-            <div className="flex gap-2">
-              {post.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="cozy-tag"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-      </header>
-
-      <div className="border-t border-line pt-8">
-        <MarkdownContent content={post.content} />
-      </div>
-
-      <footer className="mt-12 pt-8 border-t border-line">
-        <Link
-          href="/blog"
-          className="cozy-link"
-        >
-          ← Back to Blog
+    <article className="bd">
+      <div className="row">
+        <Link className="lk dim" href="/blog">
+          ← blog
         </Link>
-      </footer>
+      </div>
+      <header className="row">
+        <time className="dim" dateTime={post.date}>
+          {post.date}
+        </time>
+        <h1>{post.title}</h1>
+      </header>
+      {/* The posts open with their own "# title", already shown above. */}
+      <MarkdownContent content={post.content.replace(/^\s*# .*\n/, '')} />
     </article>
   );
 }

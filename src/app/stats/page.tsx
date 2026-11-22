@@ -1,16 +1,20 @@
 import StravaStats from '@/components/StravaStats';
 import { stravaAPI } from '@/lib/strava';
 
+export const metadata = { title: 'Stats - Vinay Shah' };
+
 // Revalidate the page every 10 minutes (600 seconds)
 export const revalidate = 600;
 
 async function getStravaData() {
+  const now = Date.now();
   try {
+    const twelveWeeksAgo = Math.floor(now / 1000) - 12 * 7 * 24 * 3600;
     const [stats, activities] = await Promise.all([
       stravaAPI.getAthleteStats(),
-      stravaAPI.getRecentActivities(5),
+      stravaAPI.getRecentActivities(200, twelveWeeksAgo),
     ]);
-    return { stats, activities };
+    return { stats, activities, now };
   } catch (error) {
     console.error('Failed to fetch Strava data:', error);
     return null;
@@ -21,24 +25,13 @@ export default async function StatsPage() {
   const data = await getStravaData();
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-16">
-      <div className="mb-8">
-        <p className="page-kicker">Miles on Strava</p>
-        <h1 className="page-title mb-4">
-          Running Stats
-        </h1>
-        <p className="page-lede">
-          My running journey tracked through Strava. Here's how I've been staying active.
-        </p>
-      </div>
-
+    <div className="bd">
       {data ? (
-        <StravaStats stats={data.stats} activities={data.activities} />
+        <StravaStats stats={data.stats} activities={data.activities} now={data.now} />
       ) : (
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-[18px] p-4">
-          <p className="text-red-800 dark:text-red-200">
-            Failed to load Strava data. Please try again later.
-          </p>
+        <div className="row">
+          <span className="dim">strava</span>
+          <span>couldn&apos;t reach strava just now. try again in a few minutes.</span>
         </div>
       )}
     </div>

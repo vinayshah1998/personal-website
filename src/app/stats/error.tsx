@@ -14,26 +14,12 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-16">
-      <div className="mb-8">
-        <p className="page-kicker">Miles on Strava</p>
-        <h1 className="page-title mb-4">
-          Running Stats
-        </h1>
-      </div>
-
-      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-[18px] p-6">
-        <h2 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
-          Something went wrong
-        </h2>
-        <p className="text-red-700 dark:text-red-300 mb-4">
-          Failed to load Strava data. This might be a temporary issue.
-        </p>
-        <button
-          onClick={() => reset()}
-          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
-        >
-          Try again
+    <div className="bd">
+      <div className="row">
+        <span className="dim">strava</span>
+        <span>something went wrong loading the stats.</span>
+        <button type="button" className="lk" onClick={() => reset()}>
+          try again
         </button>
       </div>
     </div>
