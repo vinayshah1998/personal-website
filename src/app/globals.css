@@ -15,6 +15,7 @@ html {
   background: var(--bg);
   color: var(--fg);
   touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {

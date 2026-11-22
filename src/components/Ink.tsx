@@ -28,6 +28,7 @@ export default function Ink() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engine = useRef<Engine>(null);
   const first = useRef(true);
+  const lastInput = useRef<'keyboard' | 'pointer'>('pointer');
   const [time, setTime] = useState('');
 
   useEffect(() => {
@@ -310,10 +311,23 @@ export default function Ink() {
   }, []);
 
   useEffect(() => {
+    const keyboard = () => (lastInput.current = 'keyboard');
+    const pointer = () => (lastInput.current = 'pointer');
+    window.addEventListener('keydown', keyboard, true);
+    window.addEventListener('pointerdown', pointer, true);
+    return () => {
+      window.removeEventListener('keydown', keyboard, true);
+      window.removeEventListener('pointerdown', pointer, true);
+    };
+  }, []);
+
+  useEffect(() => {
     const isFirst = first.current;
     first.current = false;
     engine.current?.setPage(home, isFirst);
-    if (!isFirst) {
+    // Move focus to the new page's link only after keyboard navigation. Safari shows a focus ring for programmatic
+    // focus, so after a tap or click it would draw a box around the link.
+    if (!isFirst && lastInput.current === 'keyboard') {
       const target = document.querySelector<HTMLElement>('.site [aria-current="page"]') ?? document.querySelector<HTMLElement>('.site a');
       target?.focus({ preventScroll: true });
     }

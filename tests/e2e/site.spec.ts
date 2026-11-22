@@ -247,3 +247,26 @@ test('under reduced motion the stats charts and headline appear at once', async 
   expect(await page.locator('.big').textContent()).toBe(final);
   expect(await painted(page, '.chart.area')).toBeGreaterThan(2000);
 });
+
+test('a tap or click on a nav link leaves no focus ring on the new page; Enter from the keyboard does', async ({ page, isMobile }) => {
+  const nav = page.getByRole('navigation', { name: 'Site' });
+  const ringed = () => page.evaluate(() => document.querySelector(':focus-visible')?.textContent ?? null);
+  const focused = () => page.evaluate(() => document.activeElement?.textContent ?? null);
+
+  await page.goto('/');
+  const projects = nav.getByRole('link', { name: 'projects' });
+  if (isMobile) await projects.tap();
+  else await projects.click();
+  await expect(page).toHaveURL(/\/projects\/$/);
+  await expect(nav.getByRole('link', { name: 'projects' })).toHaveAttribute('aria-current', 'page');
+  await page.waitForTimeout(200);
+  expect(await ringed()).toBeNull();
+  expect(await focused()).not.toBe('projects');
+  expect(await page.evaluate(() => getComputedStyle(document.querySelector('.lk')!).getPropertyValue('-webkit-tap-highlight-color'))).toBe('rgba(0, 0, 0, 0)');
+
+  await page.goto('/');
+  await nav.getByRole('link', { name: 'blog' }).focus();
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/\/blog\/$/);
+  await expect.poll(ringed).toBe('blog');
+});
