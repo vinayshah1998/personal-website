@@ -1,8 +1,8 @@
 'use client';
 
-import { useRef } from 'react';
+import { useContext, useRef } from 'react';
 import { MONTHS, type RunningSeries } from '@/lib/running';
-import { bars, clamp, ease, grad, PX, sq, tip, useDither } from './useDither';
+import { bars, clamp, ease, grad, Picks, PX, sq, tip, useDither } from './useDither';
 
 interface Props {
   series: RunningSeries;
@@ -17,11 +17,13 @@ export default function StatsCharts({ series, total, summary }: Props) {
   const barsRef = useRef<HTMLDivElement>(null);
   const areaRef = useRef<HTMLDivElement>(null);
   const { year, weeks, weekStarts, thisYear, lastYear } = series;
+  const picks = useContext(Picks);
 
   useDither(
     [barsRef, areaRef],
     ([CB, CA]) => {
-      let bar = 11, mon = thisYear.length - 1, slot = 1;
+      // Until something is hovered or tapped: this week, and this month.
+      let bar = picks.get('weeks') ?? 11, mon = picks.get('ytd') ?? thisYear.length - 1, slot = 1;
       return {
         draw(p, ink) {
           slot = bars(CB, weeks, bar, p, ink, (i) => `${weekStarts[i]}  ${weeks[i].toFixed(1)} mi`);
@@ -66,12 +68,8 @@ export default function StatsCharts({ series, total, summary }: Props) {
           );
         },
         scrub(i, x) {
-          if (i === 0) bar = clamp(Math.floor(x / slot), 0, weeks.length - 1);
-          else mon = clamp(Math.round((x / CA.w) * 11), 0, 11);
-        },
-        leave(i) {
-          if (i === 0) bar = 11;
-          else mon = thisYear.length - 1;
+          if (i === 0) picks.set('weeks', (bar = clamp(Math.floor(x / slot), 0, weeks.length - 1)));
+          else picks.set('ytd', (mon = clamp(Math.round((x / CA.w) * 11), 0, 11)));
         },
         count(e) {
           bigRef.current!.textContent = `${(total * e).toFixed(1)} mi`;

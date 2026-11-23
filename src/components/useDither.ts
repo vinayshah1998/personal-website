@@ -1,11 +1,17 @@
 'use client';
 
-import { useEffect, type RefObject } from 'react';
+import { createContext, useEffect, type RefObject } from 'react';
 import { localHour, mix, palette, rgb, type RGB } from '@/lib/ink';
 
 // The stats prototype's dithered charts: a 3px grid of 2.4px squares, Gradient fill, and a blurred bloom canvas.
 export const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16);
 export const PX = 3;
+
+/**
+ * Each chart's last hovered or tapped point, by chart name. It stays selected after the pointer leaves, and
+ * StatsTabs keeps one map for the page visit, so switching tabs and back keeps it too.
+ */
+export const Picks = createContext(new Map<string, number>());
 const SQ = 2.4;
 export const clamp = (v: number, a = 0, b = 1) => (v < a ? a : v > b ? b : v);
 export const ease = (t: number) => 1 - Math.pow(1 - t, 3);
@@ -72,8 +78,6 @@ export interface Scene {
   draw(p: number, ink: Ink): void;
   /** A pointer at (x, y) over chart i. */
   scrub(i: number, x: number, y: number): void;
-  /** A mouse left chart i: select its default again. */
-  leave(i: number): void;
   /** The headline count-up, eased 0 to 1. */
   count?(e: number): void;
 }
@@ -142,25 +146,18 @@ export function useDither(refs: RefObject<HTMLDivElement | null>[], setup: (char
       request();
     };
 
-    // Hover and taps move the tooltip; a mouse leaving puts it back, a lifted finger leaves it where it was.
+    // Hover and taps move the selection and its tooltip, which stay where they are after the pointer leaves.
     const off = charts.map((C, i) => {
       const move = (e: PointerEvent) => {
         const r = C.el.getBoundingClientRect();
         scene.scrub(i, e.clientX - r.left, e.clientY - r.top);
         redraw();
       };
-      const leave = (e: PointerEvent) => {
-        if (e.pointerType !== 'mouse') return;
-        scene.leave(i);
-        redraw();
-      };
       C.el.addEventListener('pointermove', move);
       C.el.addEventListener('pointerdown', move);
-      C.el.addEventListener('pointerleave', leave);
       return () => {
         C.el.removeEventListener('pointermove', move);
         C.el.removeEventListener('pointerdown', move);
-        C.el.removeEventListener('pointerleave', leave);
       };
     });
     const ro = new ResizeObserver(() => {

@@ -283,6 +283,11 @@ test('stats charts every run this year and last, from every page of activities',
   if (isMobile) await page.touchscreen.tap(bars.x + 10, bars.y + bars.height / 2);
   else await page.mouse.move(bars.x + 10, bars.y + bars.height / 2);
   await expect(tip).toHaveText(new RegExp(`^${first} `));
+  // The pointer leaving keeps that week selected.
+  if (isMobile) await page.touchscreen.tap(bars.x + bars.width / 2, bars.y - 60);
+  else await page.mouse.move(bars.x + bars.width / 2, bars.y - 60);
+  await page.waitForTimeout(200);
+  await expect(tip).toHaveText(new RegExp(`^${first} `));
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
   expect(errors).toEqual([]);
 });
@@ -353,7 +358,35 @@ test('the coding tab shows the GitHub calendar: total, heatmap, weekday averages
   const heat = (await page.locator('.chart.heat').boundingBox())!;
   if (isMobile) await page.touchscreen.tap(heat.x + 2, heat.y + 24);
   else await page.mouse.move(heat.x + 2, heat.y + 24);
-  await expect(page.locator('.chart.heat .tip')).toHaveText(`mon ${month} ${dd}, ${monday.count} contribution${monday.count === 1 ? '' : 's'}`);
+  const heatTip = page.locator('.chart.heat .tip');
+  const mondayLabel = `mon ${month} ${dd}, ${monday.count} contribution${monday.count === 1 ? '' : 's'}`;
+  await expect(heatTip).toHaveText(mondayLabel);
+
+  // Weekday bars start on today's weekday. The last bar pointed at stays selected after the pointer leaves, and
+  // both selections survive switching tabs and back.
+  const dow = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+  const todayDow = dow[(Math.floor(Date.parse(days.at(-1)!.date) / 86_400_000) + 3) % 7];
+  const pick = dow[(dow.indexOf(todayDow) + 3) % 7];
+  const wdTip = page.locator('.chart.weekday .tip');
+  await expect(wdTip).toHaveText(new RegExp(`^${todayDow} `));
+  const wd = (await page.locator('.chart.weekday').boundingBox())!;
+  const at = [wd.x + (wd.width * (dow.indexOf(pick) + 0.5)) / 7, wd.y + wd.height - 6] as const;
+  if (isMobile) await page.touchscreen.tap(...at);
+  else await page.mouse.move(...at);
+  await expect(wdTip).toHaveText(new RegExp(`^${pick} `));
+  if (isMobile) await page.touchscreen.tap(wd.x + wd.width / 2, wd.y + wd.height + 60);
+  else await page.mouse.move(wd.x + wd.width / 2, wd.y + wd.height + 60);
+  await page.waitForTimeout(200);
+  await expect(wdTip).toHaveText(new RegExp(`^${pick} `));
+  await expect(heatTip).toHaveText(mondayLabel);
+  const running = tabs.getByRole('tab', { name: 'running' });
+  if (isMobile) await running.tap();
+  else await running.click();
+  await expect(page.locator('.chart.area')).toBeVisible();
+  if (isMobile) await coding.tap();
+  else await coding.click();
+  await expect(wdTip).toHaveText(new RegExp(`^${pick} `));
+  await expect(heatTip).toHaveText(mondayLabel);
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
 
   // A link to #coding opens the tab, and the arrow keys move between tabs.

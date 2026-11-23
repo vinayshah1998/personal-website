@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, type KeyboardEvent, type ReactNode } from 'react';
+import { Picks } from './useDither';
 
 const TABS = ['running', 'coding'] as const;
 type Tab = (typeof TABS)[number];
@@ -8,6 +9,7 @@ type Tab = (typeof TABS)[number];
 /** Running and coding tabs on the stats page. Only the open tab is mounted, so its charts draw in each time. #coding opens coding. */
 export default function StatsTabs(panels: Record<Tab, ReactNode>) {
   const [tab, setTab] = useState<Tab>('running');
+  const [picks] = useState(() => new Map<string, number>());
   useEffect(() => {
     if (location.hash === '#coding') setTab('coding');
   }, []);
@@ -45,7 +47,7 @@ export default function StatsTabs(panels: Record<Tab, ReactNode>) {
         {tab === 'running' && <span className="dim">from strava</span>}
       </div>
       <div className="sec" id="stats-panel" role="tabpanel" aria-labelledby={`tab-${tab}`}>
-        {panels[tab]}
+        <Picks.Provider value={picks}>{panels[tab]}</Picks.Provider>
       </div>
     </>
   );

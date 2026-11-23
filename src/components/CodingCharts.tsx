@@ -1,9 +1,9 @@
 'use client';
 
-import { useRef } from 'react';
+import { useContext, useRef } from 'react';
 import { weekdayOf, type CodingSeries } from '@/lib/github';
 import { MONTHS } from '@/lib/running';
-import { bars, BAYER, clamp, ease, px, tip, useDither } from './useDither';
+import { bars, BAYER, clamp, ease, Picks, px, tip, useDither } from './useDither';
 
 const DOW = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const fmtN = (n: number) => n.toLocaleString('en-US');
@@ -18,11 +18,13 @@ export default function CodingCharts({ series }: { series: CodingSeries }) {
   const { total, grid, weekday, current, longest } = series;
   const weeks = Math.ceil(grid.length / 7);
   const today = grid.length - 1;
+  const picks = useContext(Picks);
 
   useDither(
     [heatRef, weekRef],
     ([HM, WD]) => {
-      let day = today, wd = today % 7, slot = 1, colW = 1, rowH = 1;
+      // Until something is hovered or tapped: today, and today's weekday.
+      let day = picks.get('day') ?? today, wd = picks.get('weekday') ?? today % 7, slot = 1, colW = 1, rowH = 1;
       const top = 22;
       return {
         draw(p, ink) {
@@ -47,12 +49,8 @@ export default function CodingCharts({ series }: { series: CodingSeries }) {
         scrub(i, x, y) {
           if (i === 0) {
             const w = clamp(Math.floor(x / colW), 0, weeks - 1), d = clamp(Math.floor((y - top) / rowH), 0, 6);
-            day = Math.min(today, w * 7 + d);
-          } else wd = clamp(Math.floor(x / slot), 0, 6);
-        },
-        leave(i) {
-          if (i === 0) day = today;
-          else wd = today % 7;
+            picks.set('day', (day = Math.min(today, w * 7 + d)));
+          } else picks.set('weekday', (wd = clamp(Math.floor(x / slot), 0, 6)));
         },
         count(e) {
           bigRef.current!.textContent = `${fmtN(Math.round(total * e))} contributions`;
