@@ -676,6 +676,7 @@ main,
 
 .term-scroll {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   align-content: start;
   height: 300px;
   overflow-y: auto;
@@ -692,16 +693,15 @@ main,
   font-weight: bold;
 }
 
-/* Diff rows keep their gutter: on a narrow screen they scroll sideways, like a terminal, instead of wrapping. */
-.cli .diff {
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
+/* Diff rows keep their gutter, and long code wraps under itself, so the mock always fits its width. */
+.cli .dl {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0 2ch;
+  padding: 0 2px;
 }
 
-.cli .dl {
-  width: max-content;
-  min-width: 100%;
-  padding: 0 2px;
+.cli .dl > span:first-child {
   white-space: pre;
 }
 
@@ -724,6 +724,9 @@ main,
 }
 
 .cli .opts button {
+  display: grid;
+  grid-template-columns: 1ch minmax(0, 1fr);
+  gap: 0 1ch;
   text-align: left;
   white-space: pre-wrap;
 }

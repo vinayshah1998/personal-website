@@ -28,7 +28,7 @@ const Out = ({ link }: { link: ProjectLink }) => (
 
 /** The projects as a quiet list: tapping one opens its demo, links, and posts inline. */
 export default function ProjectList({ projects, more }: { projects: Listed[]; more: ProjectLink[] }) {
-  const [open, setOpen] = useState<string | null>(projects[0].id);
+  const [open, setOpen] = useState<string | null>(null);
   return (
     <>
       {projects.map((p) => {

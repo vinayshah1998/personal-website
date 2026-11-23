@@ -20,10 +20,10 @@ const SCRIPT: [number, () => ReactNode][] = [
           <span className="del">removed 1 line</span>
           <span className="dim"> at L14 in client.ts</span>
         </div>
-        <div className="dl del-row">{'  14 -  const res = await put(key, body);'}</div>
-        <div className="dl add-row">{'  14 +  const res = await withRetry(() => put(key, body), {'}</div>
-        <div className="dl add-row">{'  15 +    tries: 3, baseMs: 200, jitter: true,'}</div>
-        <div className="dl add-row">{'  16 +  });'}</div>
+        <Line n={14} sign="-" code="const res = await put(key, body);" />
+        <Line n={14} sign="+" code="const res = await withRetry(() => put(key, body), {" />
+        <Line n={15} sign="+" code="  tries: 3, baseMs: 200, jitter: true," />
+        <Line n={16} sign="+" code="});" />
       </div>
     ),
   ],
@@ -36,6 +36,16 @@ const OPTIONS = [
   'Create allow rule to approve future similar actions',
   'Create deny rule to block future similar actions',
 ];
+
+/** A diff row: the line number and sign stay in their own column, and long code wraps under itself. */
+function Line({ n, sign, code }: { n: number; sign: '+' | '-'; code: string }) {
+  return (
+    <div className={sign === '+' ? 'dl add-row' : 'dl del-row'}>
+      <span className="dim">{`${String(n).padStart(4)} ${sign}`}</span>
+      <span>{code}</span>
+    </div>
+  );
+}
 
 function Tool({ name, target, state = 'ok' }: { name: string; target: string; state?: 'ok' | 'run' | 'bad' }) {
   return (
@@ -148,8 +158,8 @@ export default function KiroCliMock() {
             <div className="opts">
               {OPTIONS.map((o, i) => (
                 <button key={o} type="button" className={i === sel ? 'on' : ''} onClick={() => choose(i)} onPointerEnter={() => setSel(i)}>
-                  {i === sel ? '❯ ' : '  '}
-                  {o}
+                  <span>{i === sel ? '❯' : ' '}</span>
+                  <span>{o}</span>
                 </button>
               ))}
             </div>

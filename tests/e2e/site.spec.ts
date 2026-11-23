@@ -102,13 +102,22 @@ test('projects: a quiet list in order, each opening inline with its links, posts
   }
   await expect(page.locator('.more a')).toHaveText(['pstack-agent-plugin', 'opencode-provider-kiro', 'pi-provider-kiro', 'rust-harness-lab', 'llm_time_blocker', 'locus_hackathon'].map((r) => `${r} ↗`));
 
-  // kiro-cli is open first: its run reaches the approval, and allowing it finishes the run.
+  // Every project starts closed; opening kiro-cli plays its run to the approval, and allowing it finishes the run.
+  await expect(page.locator('button.ph[aria-expanded="true"]')).toHaveCount(0);
+  await expect(page.locator('.pbody:visible')).toHaveCount(0);
   const cli = project('kiro-cli');
+  await press(cli.locator('.ph'));
   await expect(cli.locator('.ph')).toHaveAttribute('aria-expanded', 'true');
   await expect(cli.getByRole('link', { name: 'Counting frames' })).toHaveAttribute('href', '/blog/counting-frames/');
   await expect(cli.locator('.pbody .lk')).toHaveCount(12);
   await press(cli.getByRole('button', { name: /Allow once/ }));
   await expect(cli.getByText('All 38 tests pass.')).toBeVisible();
+  // The terminal fits its width: nothing in it scrolls or spills sideways.
+  const wide = await cli.locator('.mock').evaluate((m) => {
+    const box = m.getBoundingClientRect();
+    return [m, ...m.querySelectorAll('*')].filter((el) => el.scrollWidth > el.clientWidth + 1 || el.getBoundingClientRect().right > box.right + 1).length;
+  });
+  expect(wide).toBe(0);
 
   // Opening another project closes the first; Orbits resolves the same permission in both panes.
   const orbits = project('kiro orbits');
