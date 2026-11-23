@@ -37,7 +37,7 @@ This is a Next.js 15 personal website using the App Router architecture with the
 
 #### Shared Components (`src/components/`)
 - **StravaStats**: Year-to-date totals and the latest run, around **StatsCharts** (client): dithered canvas charts of the last 12 weeks and year to date vs last year, colored by the time-of-day palette. Series come from `src/lib/running.ts`. The stats page has running and coding tabs (**StatsTabs**); **CodingCharts** draws the public GitHub contribution calendar (`src/lib/github.ts`, cached a day). Both chart sets share `src/components/useDither.ts`; e2e tests serve Strava and GitHub from `tests/e2e/mock-server.mjs`
-- **MarkdownContent**: Renders blog markdown in the plain `.doc` style
+- **MarkdownContent**: Renders blog markdown in the plain `.doc` style. A line of its own like `[[ink-steps]]` embeds a component from its `EMBEDS` map; **InkSteps** (client) is the step-by-step ink explainer in the paint-on post, built on the same Bayer matrix, ramp, diffusion, and palette helpers as the homepage (`src/lib/ink.ts`)
 
 ### Data Layer (`src/lib/`)
 

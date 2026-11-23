@@ -143,6 +143,53 @@ test('the longest post scrolls to its end by touch, and pinching does not zoom',
   expect(await page.evaluate(() => visualViewport!.scale)).toBe(1);
 });
 
+test('the paint-on post embeds the ink explainer: five steps, drags paint inside it, and the page still scrolls', async ({ page, isMobile }) => {
+  const errors = trackErrors(page);
+  await page.goto('/blog/homepage-you-can-paint-on/');
+  await expect(page.getByRole('heading', { name: 'How it works' })).toBeVisible();
+  const fig = page.locator('figure.steps');
+  // The marker line is swapped for the component, not printed.
+  await expect(page.getByText('[[ink-steps]]')).toHaveCount(0);
+  await expect(fig.getByRole('button', { name: '5 color' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(fig.getByRole('slider', { name: 'time of day' })).toBeVisible();
+  await fig.getByRole('button', { name: '3 dither' }).click();
+  await expect(fig.locator('.bayer span')).toHaveText('0 8 2 10 12 4 14 6 3 11 1 9 15 7 13 5'.split(' '));
+  await fig.getByRole('button', { name: '4 letters' }).click();
+  await expect(fig.locator('.ramp')).toHaveText(' .,:;-=+*#%@');
+
+  const stage = fig.locator('.steps-stage');
+  await stage.scrollIntoViewIfNeeded();
+  const drawn = () =>
+    stage.locator('canvas').evaluate((cv: HTMLCanvasElement) => {
+      const d = cv.getContext('2d')!.getImageData(0, 0, cv.width, cv.height).data;
+      let n = 0;
+      for (let i = 3; i < d.length; i += 4) if (d[i]) n++;
+      return n;
+    });
+  // Clearing leaves only the faint baseline of dots, like the homepage; painting adds ink on top of it.
+  const before = await drawn();
+  await fig.getByRole('button', { name: 'clear' }).click();
+  await expect.poll(drawn).toBeLessThan(before);
+  const cleared = await drawn();
+  const box = (await stage.boundingBox())!;
+  const path = Array.from({ length: 14 }, (_, i) => [box.x + 30 + i * 18, box.y + box.height * (0.2 + (0.6 * i) / 13)] as [number, number]);
+  if (isMobile) {
+    // A vertical-ish drag inside the stage paints instead of scrolling; outside it, the page scrolls.
+    const y = await page.evaluate(() => scrollY);
+    await touchDrag(page, path);
+    expect(await page.evaluate(() => scrollY)).toBe(y);
+    await expect.poll(drawn).toBeGreaterThan(cleared + 500);
+    const h = page.viewportSize()!.height;
+    await touchDrag(page, [[10, h - 40], [10, h / 2], [10, 60]]);
+    await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(y + 50);
+  } else {
+    await page.mouse.move(...path[0]);
+    for (const p of path.slice(1)) await page.mouse.move(...p, { steps: 3 });
+    await expect.poll(drawn).toBeGreaterThan(cleared + 500);
+  }
+  expect(errors).toEqual([]);
+});
+
 test('a 200% browser font size reflows every page without sideways scroll or overlap', async ({ page }) => {
   // Stands in for the browser's default font size setting, which sets the root font size.
   await page.route(/\/[^_.]*\/?$/, async (route) => {

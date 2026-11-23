@@ -47,6 +47,42 @@ return['rgb('+(c[0]|0)+','+(c[1]|0)+','+(c[2]|0)+')',(0.2126*c[0]+0.7152*c[1]+0.
 export const mix = (a: RGB, b: RGB, t: number) => a.map((v, i) => v + (b[i] - v) * t);
 export const rgb = (c: RGB) => `rgb(${c[0] | 0},${c[1] | 0},${c[2] | 0})`;
 
+/** The 4×4 Bayer matrix, 0 to 15, and as thresholds that nudge each cell's ink before it rounds to a level. */
+export const BAYER16 = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+export const BAYER = BAYER16.map((v) => (v + 0.5) / 16);
+/** The 12 levels, lightest to darkest. */
+export const RAMP = ' .,:;-=+*#%@';
+export const LV = RAMP.length - 1;
+
+/** The ramp level for ink amount v in cell (x, y), dithered by the Bayer matrix. */
+export function level(x: number, y: number, v: number): number {
+  const i = (v * LV + BAYER[(y & 3) * 4 + (x & 3)]) | 0;
+  return i < 0 ? 0 : i > LV ? LV : i;
+}
+
+/** One frame of spread and fade: each cell averages itself (weight 4) with its four neighbors, then loses 0.4%. */
+export function diffuse(D: Float32Array, out: Float32Array, cols: number, rows: number) {
+  for (let y = 1; y < rows - 1; y++)
+    for (let x = 1; x < cols - 1; x++) {
+      const i = y * cols + x;
+      out[i] = (D[i] * 4 + D[i - 1] + D[i + 1] + D[i - cols] + D[i + cols]) * 0.125 * 0.996;
+    }
+}
+
+/** Ink colors: 33 blends from ink 1 to ink 2, each with 9 steps toward the accent. Index with inkColor(). */
+export function inkTable(P: Palette): string[] {
+  const tab: string[] = [];
+  for (let i = 0; i <= 32; i++) {
+    const b = mix(P.c1, P.c2, i / 32);
+    for (let j = 0; j <= 8; j++) tab.push(rgb(mix(b, P.ac, (j / 8) * 0.9)));
+  }
+  return tab;
+}
+
+/** The table entry for a cell's ink-blend t and accent amount m, both 0 to 1. */
+export const inkColor = (tab: string[], t: number, m: number) =>
+  tab[((Math.min(1, Math.max(0, t)) * 32 + 0.5) | 0) * 9 + ((Math.min(1, Math.max(0, m)) * 8 + 0.5) | 0)];
+
 /** Local clock, as in "4:07 pm". Reads the Date's own fields: the fractional hour loses minutes to rounding. */
 export function clock(d = new Date()): string {
   const h = d.getHours();

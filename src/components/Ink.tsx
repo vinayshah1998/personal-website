@@ -3,11 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { clock, everyMinute, localHour, mix, palette, rgb } from '@/lib/ink';
+import { clock, diffuse, everyMinute, inkColor, inkTable, level, localHour, palette, RAMP, rgb } from '@/lib/ink';
 
-const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16);
-const RAMP = ' .,:;-=+*#%@';
-const LV = RAMP.length - 1;
 const GL = '!<>-_\\/[]{}=+*^?#%@';
 const PAGES = ['about', 'projects', 'blog', 'stats'];
 const clamp = (v: number, a = 0, b = 1) => (v < a ? a : v > b ? b : v);
@@ -45,21 +42,16 @@ export default function Ink() {
 
     function build() {
       const P = palette(S.hour);
-      TAB = [];
-      for (let i = 0; i <= 32; i++) {
-        const b = mix(P.c1, P.c2, i / 32);
-        for (let j = 0; j <= 8; j++) TAB.push(rgb(mix(b, P.ac, (j / 8) * 0.9)));
-      }
+      TAB = inkTable(P);
       bgStr = rgb(P.bg);
       const root = document.documentElement.style;
       root.setProperty('--bg', bgStr);
       root.setProperty('--fg', P.fg);
     }
     function put(x: number, y: number, v: number, t: number, m: number) {
-      let i = (v * LV + BAYER[(y & 3) * 4 + (x & 3)]) | 0;
+      const i = level(x, y, v);
       if (i <= 0) return;
-      if (i > LV) i = LV;
-      const c = TAB[((clamp(t) * 32 + 0.5) | 0) * 9 + ((clamp(m) * 8 + 0.5) | 0)];
+      const c = inkColor(TAB, t, m);
       if (c !== lastFill) {
         ctx.fillStyle = c;
         lastFill = c;
@@ -208,11 +200,7 @@ export default function Ink() {
             C[i] += (ht - C[i]) * g * 0.3;
           }
       }
-      for (let y = 1; y < rows - 1; y++)
-        for (let x = 1; x < cols - 1; x++) {
-          const i = y * cols + x;
-          D2[i] = (D[i] * 4 + D[i - 1] + D[i + 1] + D[i - cols] + D[i + cols]) * 0.125 * 0.996;
-        }
+      diffuse(D, D2, cols, rows);
       const T = D;
       D = D2;
       D2 = T;

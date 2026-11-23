@@ -232,7 +232,8 @@ main,
   margin-left: -6px;
 }
 
-.tabs button {
+.tabs button,
+.seg button {
   display: inline-flex;
   align-items: center;
   min-height: 32px;
@@ -248,24 +249,29 @@ main,
 
 /* Full 44px tap targets on touch screens. */
 @media (pointer: coarse) {
-  .tabs button {
+  .tabs button,
+  .seg button {
     min-height: 44px;
   }
 }
 
-.tabs button[aria-selected='true'] {
+.tabs button[aria-selected='true'],
+.seg button[aria-pressed='true'] {
   opacity: 1;
   text-decoration: underline;
   text-underline-offset: 4px;
 }
 
-.tabs button:focus-visible {
+.tabs button:focus-visible,
+.seg button:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: -2px;
 }
 
 @media (hover: hover) {
-  .tabs button:hover {
+  .tabs button:hover,
+  .seg button:hover,
+  .steps .clear:hover {
     opacity: 1;
   }
 }
@@ -407,4 +413,106 @@ main,
   width: 100%;
   border: 0;
   border-top: 1px dashed color-mix(in srgb, currentColor 40%, transparent);
+}
+
+/* The ink explainer in "A homepage you can paint on": the pipeline one step at a time, on a stage you can paint. */
+.steps {
+  display: grid;
+  gap: 10px;
+  justify-self: stretch;
+  margin: 4px 0;
+}
+
+.seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 4px;
+  margin-left: -6px;
+}
+
+.steps-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.steps-foot > .row {
+  flex: 1;
+}
+
+.steps .clear {
+  min-height: 32px;
+  padding: 0 6px;
+  margin: 0 -6px 0 auto;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  opacity: 0.62;
+  cursor: pointer;
+}
+
+@media (pointer: coarse) {
+  .steps .clear {
+    min-height: 44px;
+  }
+}
+
+.steps .clear:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+
+/* Drags inside the stage paint instead of scrolling; the page around it still scrolls. */
+.steps-stage {
+  position: relative;
+  height: 240px;
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-radius: 2px;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  cursor: crosshair;
+}
+
+.steps-stage canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.bayer {
+  display: grid;
+  grid-template-columns: repeat(4, 3ch);
+  gap: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bayer span {
+  display: grid;
+  place-items: center;
+  height: 1.5rem;
+  background: color-mix(in srgb, currentColor calc(var(--v) * 28% + 4%), transparent);
+}
+
+.ramp {
+  white-space: pre;
+  letter-spacing: 0.5em;
+  padding: 2px 0.5em;
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+}
+
+.steps .hour {
+  justify-items: stretch;
+}
+
+.steps input[type='range'] {
+  width: 100%;
+  min-height: 32px;
+  accent-color: currentColor;
 }
