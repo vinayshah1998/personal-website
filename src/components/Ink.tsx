@@ -253,6 +253,13 @@ export default function Ink() {
       if (e.pointerType !== 'mouse') release();
     };
     const onVisibility = () => !document.hidden && run();
+    // touch-action none stops a paint drag from scrolling, but Chrome still starts a fling for a fast one; it moves
+    // nothing, yet the next tap stops it and Chrome swallows that tap's click, so a nav link tapped right after a
+    // swipe didn't navigate. Consuming the moves means no scroll gesture or fling starts at all.
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.cancelable && (e.target as Element).closest?.('.home')) e.preventDefault();
+    };
+    document.addEventListener('touchmove', onTouchMove, { passive: false });
     window.addEventListener('pointermove', onMove, { passive: true });
     window.addEventListener('pointerdown', onDown, { passive: true });
     window.addEventListener('pointerup', onUp);
@@ -298,6 +305,7 @@ export default function Ink() {
       window.removeEventListener('pointercancel', release);
       document.documentElement.removeEventListener('pointerleave', release);
       document.removeEventListener('visibilitychange', onVisibility);
+      document.removeEventListener('touchmove', onTouchMove);
     };
   }, []);
 

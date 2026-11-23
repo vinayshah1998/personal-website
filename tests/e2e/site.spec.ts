@@ -302,7 +302,9 @@ test('touch: drags paint in every direction, taps stamp ink, and nothing scrolls
   expect(await inkIn(page, upperRight)).toBeGreaterThan(upperBefore + 100);
   expect(await page.evaluate(() => window.scrollY)).toBe(0);
 
-  // The nav is real links: a tap navigates.
+  // The nav is real links: a tap navigates, even straight after a fast swipe. Chrome starts a fling for one even
+  // under touch-action none, and used to swallow the next tap's click to stop it.
+  await touchDrag(page, diagonal);
   await page.getByRole('navigation', { name: 'Site' }).getByRole('link', { name: 'about' }).tap();
   await expect(page).toHaveURL(/\/about\/$/);
   await expect(page.getByText(/^I build products that are reliable underneath and delightful on top\. Lately: agentic developer tools at Kiro/)).toBeVisible();
