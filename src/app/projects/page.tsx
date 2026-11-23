@@ -1,24 +1,22 @@
+import ProjectList from '@/components/ProjectList';
+import { getPostBySlug } from '@/lib/blog';
 import { pageMeta } from '@/lib/meta';
-import { projects } from '@/lib/projects';
+import { more, projects } from '@/lib/projects';
 
 export const metadata = pageMeta(
   '/projects/',
   'projects',
-  'Things I built: LLM Time Blocker, a Chrome extension with a Claude gatekeeper; Claude agents that negotiate payments; and LuckyNumber for iOS.',
+  'kiro-cli, Kiro Orbits, this website, LuckyNumber, and Gita Swipe, with a small working demo of each where I could make one.',
 );
 
 export default function Projects() {
+  const listed = projects.map((p) => ({
+    ...p,
+    posts: p.posts.map((slug) => ({ slug, title: getPostBySlug(slug)!.title })),
+  }));
   return (
-    <div className="bd">
-      {projects.map((project) => (
-        <div key={project.id} className="row">
-          <a className="lk" href={project.link} target="_blank" rel="noopener noreferrer">
-            {project.title.toLowerCase()}
-          </a>
-          <span>{project.summary}</span>
-          <span className="dim">{project.tech.join(', ').toLowerCase()}</span>
-        </div>
-      ))}
+    <div className="bd projects">
+      <ProjectList projects={listed} more={more} />
     </div>
   );
 }

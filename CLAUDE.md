@@ -23,7 +23,7 @@ This is a Next.js 15 personal website using the App Router architecture with the
 ### Page Structure (App Router)
 - `/` - Homepage: full-screen ink with the name, local clock, and nav
 - `/about` - About page
-- `/projects` - Projects showcase (pulls from shared data)
+- `/projects` - A quiet list of projects (from `src/lib/projects.ts`); tapping one opens its links, posts, and demo inline
 - `/blog` - Blog listing page
 - `/blog/[slug]` - Dynamic blog post pages
 - `/stats` - Strava fitness statistics integration
@@ -42,10 +42,9 @@ This is a Next.js 15 personal website using the App Router architecture with the
 ### Data Layer (`src/lib/`)
 
 #### Projects (`src/lib/projects.ts`)
-- **Centralized Data Source**: Single source of truth for all projects
-- **Type-Safe**: TypeScript interface (`Project`) defines structure
-- **Shared Access**: Imported by the projects page; `summary` is the one line shown there
-- **Usage Pattern**: Homepage truncates descriptions to 200 chars and shows max 4 tech tags
+- **Single source** for the projects page: `projects` (in display order) and `more`, the smaller public repos
+- Each project has a `summary`, `links` (private repos are labeled `github (private)` and still link), and `posts`, blog slugs whose titles the page reads from the posts
+- **ProjectList** (client) renders them; its `MOCKS` map gives each project an inline demo in `src/components/mocks/` (kiro-cli and Kiro Orbits after their real terminal and web UIs, this website as `InkSteps mini`, Gita Swipe as real app screens in `public/projects/` dithered into the palette). A project without one shows its `detail` text
 
 #### Blog System (`src/lib/blog.ts`)
 - **Content Location**: Markdown files stored in `src/app/blog/posts/`
@@ -115,10 +114,9 @@ Stored in `.env.local` (not committed to repo).
 ### Common Patterns
 
 #### Adding New Projects
-1. Add project object to `src/lib/projects.ts` array
-2. Include all required fields: id, title, description, tech, link, demo
-3. Include a one-line `summary` for the projects page
-4. Projects page shows all projects
+1. Add a project object to `projects` in `src/lib/projects.ts`, in the order it should appear
+2. Give it a one-line `summary`, its `links`, and the slugs of related `posts`
+3. Add a demo to `MOCKS` in `src/components/ProjectList.tsx` only if it looks like the real project and fits the site; otherwise give it `detail` text
 
 #### Adding New Blog Posts
 1. Create `.md` file in `src/app/blog/posts/`

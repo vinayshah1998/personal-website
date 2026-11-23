@@ -63,8 +63,7 @@ test('every page renders, and the nav moves between them without resetting the i
   await page.evaluate(() => ((window as unknown as { ink: Element }).ink = document.querySelector('canvas.ink')!));
   await nav.getByRole('link', { name: 'projects' }).click();
   await expect(page).toHaveURL(/\/projects\/$/);
-  await expect(page.getByRole('link', { name: 'llm time blocker' })).toHaveAttribute('href', 'https://github.com/vinayshah1998/llm_time_blocker');
-  await expect(page.getByText('swift, swiftui, ios 18')).toBeVisible();
+  await expect(page.getByRole('link', { name: /^llm_time_blocker/ })).toHaveAttribute('href', 'https://github.com/vinayshah1998/llm_time_blocker');
   await expect(nav.getByRole('link', { name: 'projects' })).toHaveAttribute('aria-current', 'page');
 
   await nav.getByRole('link', { name: 'blog' }).click();
@@ -78,6 +77,64 @@ test('every page renders, and the nav moves between them without resetting the i
   await page.getByRole('link', { name: 'vinay shah' }).click();
   await expect(page).toHaveURL(/\/$/);
   expect(await page.evaluate(() => (window as unknown as { ink: Element }).ink === document.querySelector('canvas.ink'))).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test('projects: a quiet list in order, each opening inline with its links, posts, and demo', async ({ page, isMobile }) => {
+  const errors = trackErrors(page);
+  const press = (l: ReturnType<Page['locator']>) => (isMobile ? l.tap() : l.click());
+  await page.goto('/projects/');
+  const toggles = page.locator('button.ph .t');
+  await expect(toggles).toHaveText(['kiro-cli', 'kiro orbits', 'this website', 'luckynumber', 'gita swipe']);
+  const project = (name: string) => page.locator('section.proj').filter({ has: page.locator('.ph .t', { hasText: new RegExp(`^${name}$`) }) });
+
+  // Every project shows its repo or site; private repos say so and still link.
+  const repos: [string, string, string][] = [
+    ['kiro-cli', 'kiro.dev/cli ↗', 'https://kiro.dev/cli'],
+    ['kiro orbits', 'github (private) ↗', 'https://github.com/vinayshah1998/kiro-orbits'],
+    ['this website', 'github ↗', 'https://github.com/vinayshah1998/personal-website'],
+    ['luckynumber', 'github (private) ↗', 'https://github.com/vinayshah1998/LuckyNumber'],
+    ['gita swipe', 'github (private) ↗', 'https://github.com/vinayshah1998/gita-swipe'],
+  ];
+  for (const [name, label, href] of repos) {
+    await expect(project(name).locator('.links a')).toHaveText(label);
+    await expect(project(name).locator('.links a')).toHaveAttribute('href', href);
+  }
+  await expect(page.locator('.more a')).toHaveText(['pstack-agent-plugin', 'opencode-provider-kiro', 'pi-provider-kiro', 'rust-harness-lab', 'llm_time_blocker', 'locus_hackathon'].map((r) => `${r} ↗`));
+
+  // kiro-cli is open first: its run reaches the approval, and allowing it finishes the run.
+  const cli = project('kiro-cli');
+  await expect(cli.locator('.ph')).toHaveAttribute('aria-expanded', 'true');
+  await expect(cli.getByRole('link', { name: 'Counting frames' })).toHaveAttribute('href', '/blog/counting-frames/');
+  await expect(cli.locator('.pbody .lk')).toHaveCount(12);
+  await press(cli.getByRole('button', { name: /Allow once/ }));
+  await expect(cli.getByText('All 38 tests pass.')).toBeVisible();
+
+  // Opening another project closes the first; Orbits resolves the same permission in both panes.
+  const orbits = project('kiro orbits');
+  await press(orbits.locator('.ph'));
+  await expect(cli.locator('.ph')).toHaveAttribute('aria-expanded', 'false');
+  await expect(cli.locator('.pbody')).toBeHidden();
+  await expect(orbits.locator('.pbody .lk')).toHaveText(['Polish you can test', 'Who gets to say yes', 'Making a terminal feel like an app']);
+  await press(orbits.locator('.web').getByRole('button', { name: 'Reject' }));
+  await expect(orbits.getByText('✓ Rejected · Run npm test')).toBeVisible();
+  await expect(orbits.getByText('resolved: Reject')).toBeVisible();
+
+  await press(project('this website').locator('.ph'));
+  await expect(project('this website').locator('.mini canvas')).toBeVisible();
+  await expect(project('this website').getByRole('link', { name: 'A homepage you can paint on' })).toBeVisible();
+
+  // LuckyNumber has no demo and no posts, only its repo and a description.
+  await press(project('luckynumber').locator('.ph'));
+  await expect(project('luckynumber').locator('.mock')).toHaveCount(0);
+  await expect(project('luckynumber').getByText(/^Roll picks someone from your contacts/)).toBeVisible();
+
+  // Gita Swipe shows the app's real screens, dithered into the site's palette.
+  const gita = project('gita swipe');
+  await press(gita.locator('.ph'));
+  await expect(gita.getByRole('img', { name: 'Gita Swipe showing verse 2.47' })).toHaveAttribute('data-drawn', '1');
+  await expect(gita.getByRole('link', { name: 'Scroll the Gita instead of doom-scrolling' })).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
   expect(errors).toEqual([]);
 });
 
@@ -403,7 +460,7 @@ test('every page has its own title and description, and a link preview image', a
   const pages: [string, string, RegExp][] = [
     ['/', 'vinay shah', /^product-minded engineer building reliable, delightful tools\. Kiro CLI, Kiro Orbits, and a few apps of my own\.$/],
     ['/about/', 'about - vinay shah', /running, hiking/],
-    ['/projects/', 'projects - vinay shah', /LLM Time Blocker/],
+    ['/projects/', 'projects - vinay shah', /^kiro-cli, Kiro Orbits, this website, LuckyNumber, and Gita Swipe/],
     ['/blog/', 'blog - vinay shah', /Stripe webhooks/],
     ['/blog/stripe-webhook-debugging/', 'Why My Stripe Webhooks Were Failing: A Production Debugging Story - vinay shah', /^How I tracked down why Stripe/],
     ['/stats/', 'stats - vinay shah', /Strava .* GitHub/],

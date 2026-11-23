@@ -47,6 +47,10 @@ export default function Ink() {
       const root = document.documentElement.style;
       root.setProperty('--bg', bgStr);
       root.setProperty('--fg', P.fg);
+      // Ink colors for the project mocks: an accent that reads on this ground, the second ink, and the hot accent.
+      root.setProperty('--acc', rgb(P.fg === '#17161b' ? P.c1 : P.ac));
+      root.setProperty('--ink2', rgb(P.c2));
+      root.setProperty('--hot', rgb(P.fg === '#17161b' ? P.ac : P.c2));
     }
     function put(x: number, y: number, v: number, t: number, m: number) {
       const i = level(x, y, v);

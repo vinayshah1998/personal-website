@@ -516,3 +516,427 @@ main,
   min-height: 32px;
   accent-color: currentColor;
 }
+
+/* Projects: a quiet list; tapping a project opens its demo, links, and posts inline. */
+.bd.projects {
+  max-width: 600px;
+  gap: 6px;
+}
+
+.proj {
+  display: grid;
+  gap: 2px;
+}
+
+.ph {
+  display: grid;
+  grid-template-columns: 1ch 1fr;
+  gap: 0 1ch;
+  min-height: 44px;
+  padding: 8px 0 4px;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.ph .mk {
+  opacity: 0.62;
+}
+
+.ph .d {
+  grid-column: 2;
+}
+
+.proj.open .ph .t {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+@media (hover: hover) {
+  .ph:hover .t {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
+
+.ph:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.proj > .links,
+.pbody {
+  margin-left: 2ch;
+}
+
+.proj > .links .lk {
+  min-height: 0;
+  padding: 0;
+  opacity: 0.62;
+}
+
+.pbody {
+  display: grid;
+  gap: 12px;
+  padding: 8px 0 16px;
+  min-width: 0;
+}
+
+.pbody[hidden] {
+  display: none;
+}
+
+.bd.projects .more {
+  margin-top: 16px;
+}
+
+/* The mocks: small, in the site's type and its time-of-day inks. */
+.mock {
+  position: relative;
+  min-width: 0;
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-radius: 2px;
+  font-size: 0.6875rem;
+  line-height: 1rem;
+}
+
+.mock button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.mock button:focus-visible,
+.mock:focus-visible,
+.mock .pane:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+
+.mock .acc,
+.mock .on {
+  color: var(--acc);
+}
+
+.mock .ok,
+.mock .add {
+  color: var(--ink2);
+}
+
+.mock .bad,
+.mock .del {
+  color: var(--hot);
+}
+
+.mock .run {
+  color: var(--acc);
+  animation: blink 0.9s steps(2) infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mock .run {
+    animation: none;
+  }
+}
+
+.mock .you,
+.mock .msg {
+  padding: 2px 6px;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.mock .rule {
+  margin: 4px 0;
+  border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+}
+
+.mock .replay {
+  margin-left: auto;
+  padding-left: 2ch;
+  opacity: 0.62;
+}
+
+/* kiro-cli */
+.cli {
+  display: grid;
+}
+
+.term-scroll {
+  display: grid;
+  align-content: start;
+  height: 300px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px 10px 0;
+  white-space: pre-wrap;
+}
+
+.cli .tg {
+  color: var(--acc);
+}
+
+.cli .brand {
+  font-weight: bold;
+}
+
+/* Diff rows keep their gutter: on a narrow screen they scroll sideways, like a terminal, instead of wrapping. */
+.cli .diff {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.cli .dl {
+  width: max-content;
+  min-width: 100%;
+  padding: 0 2px;
+  white-space: pre;
+}
+
+.cli .add-row {
+  background: color-mix(in srgb, var(--ink2) 14%, transparent);
+}
+
+.cli .del-row {
+  background: color-mix(in srgb, var(--hot) 14%, transparent);
+}
+
+.cli .ask {
+  display: grid;
+  margin: 8px 0;
+}
+
+.cli .opts {
+  display: grid;
+  margin: 6px 0;
+}
+
+.cli .opts button {
+  text-align: left;
+  white-space: pre-wrap;
+}
+
+@media (pointer: coarse) {
+  .cli .opts button {
+    padding: 4px 0;
+  }
+}
+
+.cli .status,
+.cli .prompt {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0 12px;
+  padding: 0 10px;
+}
+
+.cli .prompt {
+  justify-content: start;
+  gap: 0 1ch;
+  padding-bottom: 8px;
+}
+
+/* Kiro Orbits: the terminal and the web app, side by side when there's room. */
+.orbits {
+  display: grid;
+}
+
+@media (min-width: 640px) {
+  .orbits {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .orbits .pane + .pane {
+    border-left: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  }
+}
+
+@media (max-width: 639px) {
+  .orbits .pane + .pane {
+    border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  }
+}
+
+.orbits .pane {
+  min-width: 0;
+}
+
+.orbits .bar {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  padding: 4px 10px;
+  border-bottom: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+}
+
+.orbits .chips {
+  display: flex;
+  gap: 4px;
+}
+
+.orbits .chip {
+  padding: 0 4px;
+  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-radius: 2px;
+}
+
+.orbits .chip.warn,
+.orbits .box.warn legend {
+  color: var(--hot);
+}
+
+.orbits .term {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 8px 10px;
+}
+
+.orbits .box {
+  display: grid;
+  margin: 4px 0 0;
+  padding: 0 6px 2px;
+  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-radius: 4px;
+  min-width: 0;
+}
+
+.orbits .box.warn {
+  border-color: color-mix(in srgb, var(--hot) 70%, transparent);
+}
+
+.orbits legend {
+  padding: 0 4px;
+}
+
+.orbits legend.end {
+  margin-left: auto;
+}
+
+.orbits .box button {
+  text-align: left;
+  white-space: pre;
+}
+
+.orbits .box .on {
+  font-weight: bold;
+}
+
+.orbits .foot {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0 8px;
+}
+
+.orbits .card {
+  display: grid;
+  gap: 4px;
+  padding: 6px 8px;
+  border: 1px solid color-mix(in srgb, var(--hot) 70%, transparent);
+  border-radius: 4px;
+}
+
+.orbits .card code {
+  font: inherit;
+  padding: 2px 6px;
+  background: color-mix(in srgb, currentColor 8%, transparent);
+}
+
+.orbits .btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.orbits .btns button {
+  padding: 2px 6px;
+  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-radius: 4px;
+  text-align: left;
+}
+
+.orbits .btns .pri {
+  color: var(--bg);
+  background: var(--acc);
+  border-color: var(--acc);
+}
+
+@media (pointer: coarse) {
+  .orbits .btns button,
+  .orbits .box button {
+    min-height: 32px;
+  }
+}
+
+/* This website: a small homepage. */
+.steps-stage.mini {
+  height: 200px;
+}
+
+.mini span {
+  position: absolute;
+  pointer-events: none;
+}
+
+.mini-name {
+  top: 8px;
+  left: 10px;
+}
+
+.mini-clock {
+  top: 8px;
+  right: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.mini-nav {
+  bottom: 6px;
+  left: 10px;
+  word-spacing: 1ch;
+}
+
+/* Gita Swipe: real screens, dithered, in a phone-sized feed that swipes like the app. */
+.gita {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  border: 0;
+}
+
+.gita .phone {
+  width: 220px;
+  aspect-ratio: 400 / 866;
+  border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.gita .feed {
+  height: 100%;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+
+.gita canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  scroll-snap-align: start;
+}
