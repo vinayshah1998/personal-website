@@ -239,7 +239,7 @@ test('touch: drags paint in every direction, taps stamp ink, and nothing scrolls
   // The nav is real links: a tap navigates.
   await page.getByRole('navigation', { name: 'Site' }).getByRole('link', { name: 'about' }).tap();
   await expect(page).toHaveURL(/\/about\/$/);
-  await expect(page.getByText('software engineer.')).toBeVisible();
+  await expect(page.getByText(/^I build products that are reliable underneath and delightful on top\. Lately: agentic developer tools at Kiro/)).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -401,7 +401,7 @@ test('the coding tab shows the GitHub calendar: total, heatmap, weekday averages
 
 test('every page has its own title and description, and a link preview image', async ({ page }) => {
   const pages: [string, string, RegExp][] = [
-    ['/', 'vinay shah', /^software engineer\. I build across the stack/],
+    ['/', 'vinay shah', /^product-minded engineer building reliable, delightful tools\. Kiro CLI, Kiro Orbits, and a few apps of my own\.$/],
     ['/about/', 'about - vinay shah', /running, hiking/],
     ['/projects/', 'projects - vinay shah', /LLM Time Blocker/],
     ['/blog/', 'blog - vinay shah', /Stripe webhooks/],

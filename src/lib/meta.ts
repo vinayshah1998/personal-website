@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 export const SITE = 'vinay shah';
 export const DESCRIPTION =
-  'software engineer. I build across the stack: iOS apps, Chrome extensions, and AI agents. Also running, bread, and the occasional mountain.';
+  'product-minded engineer building reliable, delightful tools. Kiro CLI, Kiro Orbits, and a few apps of my own.';
 
 /**
  * A page's title, description, and link preview. Next replaces the layout's openGraph and twitter objects
