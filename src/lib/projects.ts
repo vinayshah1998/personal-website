@@ -12,7 +12,7 @@ export interface Project {
   detail?: string;
   /** The project's site and repo. Private repos say so in their label and still link. */
   links: ProjectLink[];
-  /** Slugs of posts about it, in src/app/blog/posts/. */
+  /** Slugs of one or two hand-picked posts about it, in src/app/blog/posts/. */
   posts: string[];
 }
 
@@ -27,20 +27,7 @@ export const projects: Project[] = [
     title: 'kiro-cli',
     summary: 'The terminal agent I work on at Kiro: chat, tools, and approvals in a fast terminal UI, held to strict checks in CI.',
     links: [{ label: 'kiro.dev/cli', href: 'https://kiro.dev/cli' }],
-    posts: [
-      'ci-fast-enough-to-trust',
-      'logins-that-work-everywhere',
-      'chunk-that-disappeared',
-      'when-the-model-says-no',
-      'one-notch-one-line',
-      'counting-frames',
-      'one-way-back',
-      'silent-refusals-lost-bytes',
-      '60-second-ghost',
-      'where-did-my-context-go',
-      'readable-errors',
-      'best-fix-was-deleting-it',
-    ],
+    posts: ['ci-fast-enough-to-trust', 'counting-frames'],
   },
   {
     id: 'kiro-orbits',
@@ -48,7 +35,7 @@ export const projects: Project[] = [
     summary:
       'Durable Kiro agent threads. Start a task in the terminal, steer and approve it from the browser; the runner owns the agent, so closing either one keeps it going.',
     links: [gh('kiro-orbits', true)],
-    posts: ['polish-you-can-test', 'who-gets-to-say-yes', 'terminal-feel-like-an-app'],
+    posts: ['terminal-feel-like-an-app', 'who-gets-to-say-yes'],
   },
   {
     id: 'website',

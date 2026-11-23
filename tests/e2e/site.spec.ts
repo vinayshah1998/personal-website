@@ -108,8 +108,10 @@ test('projects: a quiet list in order, each opening inline with its links, posts
   const cli = project('kiro-cli');
   await press(cli.locator('.ph'));
   await expect(cli.locator('.ph')).toHaveAttribute('aria-expanded', 'true');
+  // Each project links only its hand-picked posts, under "blog".
+  await expect(cli.locator('.pbody .row .dim')).toHaveText('blog');
+  await expect(cli.locator('.pbody .lk')).toHaveText(['Making CI fast enough to trust', 'Counting frames']);
   await expect(cli.getByRole('link', { name: 'Counting frames' })).toHaveAttribute('href', '/blog/counting-frames/');
-  await expect(cli.locator('.pbody .lk')).toHaveCount(12);
   await press(cli.getByRole('button', { name: /Allow once/ }));
   await expect(cli.getByText('All 38 tests pass.')).toBeVisible();
   // The terminal fits its width: nothing in it scrolls or spills sideways.
@@ -124,25 +126,26 @@ test('projects: a quiet list in order, each opening inline with its links, posts
   await press(orbits.locator('.ph'));
   await expect(cli.locator('.ph')).toHaveAttribute('aria-expanded', 'false');
   await expect(cli.locator('.pbody')).toBeHidden();
-  await expect(orbits.locator('.pbody .lk')).toHaveText(['Polish you can test', 'Who gets to say yes', 'Making a terminal feel like an app']);
+  await expect(orbits.locator('.pbody .lk')).toHaveText(['Making a terminal feel like an app', 'Who gets to say yes']);
   await press(orbits.locator('.web').getByRole('button', { name: 'Reject' }));
   await expect(orbits.getByText('✓ Rejected · Run npm test')).toBeVisible();
   await expect(orbits.getByText('resolved: Reject')).toBeVisible();
 
   await press(project('this website').locator('.ph'));
   await expect(project('this website').locator('.mini canvas')).toBeVisible();
-  await expect(project('this website').getByRole('link', { name: 'A homepage you can paint on' })).toBeVisible();
+  await expect(project('this website').locator('.pbody .lk')).toHaveText(['A homepage you can paint on']);
 
   // LuckyNumber has no demo and no posts, only its repo and a description.
   await press(project('luckynumber').locator('.ph'));
   await expect(project('luckynumber').locator('.mock')).toHaveCount(0);
+  await expect(project('luckynumber').locator('.pbody .row')).toHaveCount(0);
   await expect(project('luckynumber').getByText(/^Roll picks someone from your contacts/)).toBeVisible();
 
   // Gita Swipe shows the app's real screens, dithered into the site's palette.
   const gita = project('gita swipe');
   await press(gita.locator('.ph'));
   await expect(gita.getByRole('img', { name: 'Gita Swipe showing verse 2.47' })).toHaveAttribute('data-drawn', '1');
-  await expect(gita.getByRole('link', { name: 'Scroll the Gita instead of doom-scrolling' })).toBeVisible();
+  await expect(gita.locator('.pbody .lk')).toHaveText(['Scroll the Gita instead of doom-scrolling']);
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
   expect(errors).toEqual([]);
 });

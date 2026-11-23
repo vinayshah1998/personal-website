@@ -59,7 +59,7 @@ export default function ProjectList({ projects, more }: { projects: Listed[]; mo
               {p.detail && <span>{p.detail}</span>}
               {p.posts.length > 0 && (
                 <div className="row">
-                  <span className="dim">writing</span>
+                  <span className="dim">blog</span>
                   {p.posts.map((post) => (
                     <Link key={post.slug} className="lk" href={`/blog/${post.slug}/`}>
                       {post.title}
