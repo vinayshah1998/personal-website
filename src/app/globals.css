@@ -520,7 +520,7 @@ main,
 /* Projects: a quiet list; tapping a project opens its demo, links, and posts inline. */
 .bd.projects {
   max-width: 600px;
-  gap: 6px;
+  gap: 18px;
 }
 
 .proj {
@@ -549,6 +549,11 @@ main,
 
 .ph .d {
   grid-column: 2;
+  margin-top: 2px;
+  opacity: 0.62;
+  /* 11px, the phone body size, so the summary steps down on desktop and stays on Departure Mono's pixel grid on phones. */
+  font-size: 0.6875rem;
+  line-height: 1.0625rem;
 }
 
 .proj.open .ph .t {
