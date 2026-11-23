@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { clock, localHour, mix, palette, rgb } from '@/lib/ink';
+import { clock, everyMinute, localHour, mix, palette, rgb } from '@/lib/ink';
 
 const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map((v) => (v + 0.5) / 16);
 const RAMP = ' .,:;-=+*#%@';
@@ -54,7 +54,6 @@ export default function Ink() {
       const root = document.documentElement.style;
       root.setProperty('--bg', bgStr);
       root.setProperty('--fg', P.fg);
-      setTime(clock(S.hour));
     }
     function put(x: number, y: number, v: number, t: number, m: number) {
       let i = (v * LV + BAYER[(y & 3) * 4 + (x & 3)]) | 0;
@@ -332,6 +331,22 @@ export default function Ink() {
       target?.focus({ preventScroll: true });
     }
   }, [pathname, home]);
+
+  // The clock flips on the minute, and right away when the tab comes back or the window regains focus, since
+  // timers stall in background tabs and during sleep.
+  useEffect(() => {
+    const update = () => setTime(clock());
+    const onVisibility = () => !document.hidden && update();
+    update();
+    const stop = everyMinute(update);
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('focus', update);
+    return () => {
+      stop();
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('focus', update);
+    };
+  }, []);
 
   // The clock's text changes, so its no-ink zone does too.
   useEffect(() => engine.current?.mask(), [time]);

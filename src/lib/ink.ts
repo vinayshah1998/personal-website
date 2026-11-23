@@ -47,11 +47,24 @@ return['rgb('+(c[0]|0)+','+(c[1]|0)+','+(c[2]|0)+')',(0.2126*c[0]+0.7152*c[1]+0.
 export const mix = (a: RGB, b: RGB, t: number) => a.map((v, i) => v + (b[i] - v) * t);
 export const rgb = (c: RGB) => `rgb(${c[0] | 0},${c[1] | 0},${c[2] | 0})`;
 
-/** Local clock, as in "4:07 pm". */
-export function clock(hour: number): string {
-  const h = Math.floor(hour);
-  const m = Math.floor((hour - h) * 60);
-  return `${h % 12 || 12}:${String(m).padStart(2, '0')} ${h < 12 ? 'am' : 'pm'}`;
+/** Local clock, as in "4:07 pm". Reads the Date's own fields: the fractional hour loses minutes to rounding. */
+export function clock(d = new Date()): string {
+  const h = d.getHours();
+  return `${h % 12 || 12}:${String(d.getMinutes()).padStart(2, '0')} ${h < 12 ? 'am' : 'pm'}`;
+}
+
+/** Calls fn at the start of every local minute. Returns a function that stops it. */
+export function everyMinute(fn: () => void): () => void {
+  let timer: ReturnType<typeof setTimeout>;
+  const arm = () => {
+    const d = new Date();
+    timer = setTimeout(() => {
+      fn();
+      arm();
+    }, 60_000 - d.getSeconds() * 1000 - d.getMilliseconds());
+  };
+  arm();
+  return () => clearTimeout(timer);
 }
 
 export const localHour = (d = new Date()) => d.getHours() + d.getMinutes() / 60;
