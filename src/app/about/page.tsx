@@ -1,4 +1,9 @@
-export const metadata = { title: 'About - Vinay Shah' };
+import { pageMeta } from '@/lib/meta';
+export const metadata = pageMeta(
+  '/about/',
+  'about',
+  'software engineer building iOS apps, Chrome extensions, and AI agent systems. Off screen: running, hiking and mountaineering, baking bread, video games.',
+);
 
 export default function About() {
   return (

@@ -1,10 +1,11 @@
-import { Metadata } from 'next';
+import { pageMeta } from '@/lib/meta';
 import Link from 'next/link';
 
-export const metadata: Metadata = {
-  title: 'Privacy Policy - LLM Time Blocker',
-  description: 'Privacy policy for the LLM Time Blocker Chrome extension, detailing how we collect, use, and protect your information.',
-};
+export const metadata = pageMeta(
+  '/foolish-enterprises/llm-time-blocker/privacy-policy/',
+  'llm time blocker privacy policy',
+  'Privacy policy for the LLM Time Blocker Chrome extension: what it collects, how it is used, who it is shared with, and your rights.',
+);
 
 export default function PrivacyPolicy() {
   return (

@@ -1,6 +1,11 @@
+import { pageMeta } from '@/lib/meta';
 import { projects } from '@/lib/projects';
 
-export const metadata = { title: 'Projects - Vinay Shah' };
+export const metadata = pageMeta(
+  '/projects/',
+  'projects',
+  'Things I built: LLM Time Blocker, a Chrome extension with a Claude gatekeeper; Claude agents that negotiate payments; and LuckyNumber for iOS.',
+);
 
 export default function Projects() {
   return (

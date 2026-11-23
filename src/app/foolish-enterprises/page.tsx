@@ -1,4 +1,9 @@
-export const metadata = { title: 'Foolish Enterprises' };
+import { pageMeta } from '@/lib/meta';
+export const metadata = pageMeta(
+  '/foolish-enterprises/',
+  'foolish enterprises',
+  'Foolish Enterprises builds mobile apps and software products, with a focus on quality, usability, and user experience.',
+);
 
 export default function FoolishEnterprises() {
   return (

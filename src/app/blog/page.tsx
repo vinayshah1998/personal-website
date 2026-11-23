@@ -1,10 +1,12 @@
+import { pageMeta } from '@/lib/meta';
 import Link from 'next/link';
 import { getAllPosts } from '@/lib/blog';
 
-export const metadata = {
-  title: 'Blog - Vinay Shah',
-  description: 'Technical writing, project retrospectives, and thoughts on software engineering.',
-};
+export const metadata = pageMeta(
+  '/blog/',
+  'blog',
+  'Notes from building and debugging: Stripe webhooks, a missing Express route in production, and a broken MacBook turned media server.',
+);
 
 export default function BlogPage() {
   const posts = getAllPosts();

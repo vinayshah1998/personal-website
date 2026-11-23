@@ -318,3 +318,33 @@ test('the coding tab shows the GitHub calendar: total, heatmap, weekday averages
   await expect(page.locator('.chart.area')).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test('every page has its own title and description, and a link preview image', async ({ page }) => {
+  const pages: [string, string, RegExp][] = [
+    ['/', 'vinay shah', /^software engineer\. I build across the stack/],
+    ['/about/', 'about - vinay shah', /running, hiking/],
+    ['/projects/', 'projects - vinay shah', /LLM Time Blocker/],
+    ['/blog/', 'blog - vinay shah', /Stripe webhooks/],
+    ['/blog/stripe-webhook-debugging/', 'Why My Stripe Webhooks Were Failing: A Production Debugging Story - vinay shah', /^How I tracked down why Stripe/],
+    ['/stats/', 'stats - vinay shah', /Strava .* GitHub/],
+    ['/foolish-enterprises/', 'foolish enterprises - vinay shah', /mobile apps/],
+    ['/foolish-enterprises/llm-time-blocker/privacy-policy/', 'llm time blocker privacy policy - vinay shah', /Privacy policy for the LLM Time Blocker/],
+  ];
+  const meta = (key: string) => page.locator(`meta[property="${key}"], meta[name="${key}"]`).getAttribute('content');
+  for (const [path, title, description] of pages) {
+    await page.goto(path);
+    await expect(page).toHaveTitle(title);
+    expect(await meta('description'), path).toMatch(description);
+    expect(await meta('og:title'), path).toBe(title);
+    expect(await meta('og:description'), path).toBe(await meta('description'));
+    expect(await meta('twitter:description'), path).toBe(await meta('description'));
+    expect(await meta('og:url'), path).toBe(`https://vinayshah.dev${path}`);
+    expect(await meta('twitter:card'), path).toBe('summary_large_image');
+    for (const key of ['og:image', 'twitter:image']) {
+      const url = new URL((await meta(key))!);
+      expect(url.origin, `${path} ${key}`).toBe('https://vinayshah.dev');
+      const image = await page.request.get(url.pathname + url.search);
+      expect(image.headers()['content-type'], `${path} ${key}`).toBe('image/png');
+    }
+  }
+});

@@ -108,10 +108,9 @@ Stored in `.env.local` (not committed to repo).
 - API routes enabled (not using static export)
 
 #### SEO & Metadata
-- Comprehensive metadata in root layout with OpenGraph and Twitter cards
-- Author: Vinay Shah
-- Site URL: https://vinayshah.dev
-- Twitter: @vinayshah1998
+- Root layout sets `metadataBase` (https://vinayshah.dev), the site title "vinay shah" with a `%s - vinay shah` template, and the default description
+- Every page builds its title, description, Open Graph, and Twitter tags with `pageMeta()` from `src/lib/meta.ts`; blog posts use their title and excerpt in `generateMetadata`
+- The link preview is `src/app/opengraph-image.png` (copied to `twitter-image.png`): a 1200x630 capture of the homepage ink in the night palette
 
 ### Common Patterns
 

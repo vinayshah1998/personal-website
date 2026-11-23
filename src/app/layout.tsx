@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Ink from "@/components/Ink";
 import { KEYFRAMES, PALETTE_JS } from "@/lib/ink";
+import { pageMeta, SITE } from "@/lib/meta";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 
@@ -21,25 +22,12 @@ r.style.setProperty('--bg',p[0]);r.style.setProperty('--fg',p[1]);
 if(!matchMedia('(prefers-reduced-motion: reduce)').matches){r.classList.add('scr-wait');setTimeout(function(){r.classList.remove('scr-wait')},3000)}}catch(e){}})()`;
 
 export const metadata: Metadata = {
-  title: "Vinay Shah's Website",
-  description: "Personal website and portfolio",
-  keywords: ["developer", "portfolio", "projects", "web development"],
+  metadataBase: new URL("https://vinayshah.dev"),
+  title: { default: SITE, template: `%s - ${SITE}` },
+  keywords: ["software engineer", "developer", "portfolio", "projects"],
   authors: [{ name: "Vinay Shah" }],
   creator: "Vinay Shah",
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: "https://vinayshah.dev",
-    title: "Vinay Shah - Personal Website",
-    description: "Personal website and portfolio",
-    siteName: "Vinay Shah",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Vinay Shah - Personal Website",
-    description: "Personal website and portfolio",
-    creator: "@vinayshah1998",
-  },
+  ...pageMeta("/", null),
 };
 
 export const viewport: Viewport = {

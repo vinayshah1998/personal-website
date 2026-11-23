@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getAllPosts, getPostBySlug } from '@/lib/blog';
 import MarkdownContent from '@/components/MarkdownContent';
+import { pageMeta } from '@/lib/meta';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -24,17 +25,7 @@ export async function generateMetadata({ params }: PageProps) {
     };
   }
 
-  return {
-    title: `${post.title} - Vinay Shah`,
-    description: post.excerpt,
-    openGraph: {
-      title: post.title,
-      description: post.excerpt,
-      type: 'article',
-      publishedTime: post.date,
-      tags: post.tags,
-    },
-  };
+  return pageMeta(`/blog/${slug}/`, post.title, post.excerpt, { publishedTime: post.date, tags: post.tags });
 }
 
 export default async function BlogPostPage({ params }: PageProps) {

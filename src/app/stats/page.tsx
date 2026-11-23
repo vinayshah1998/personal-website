@@ -1,3 +1,4 @@
+import { pageMeta } from '@/lib/meta';
 import { unstable_cache } from 'next/cache';
 import CodingCharts from '@/components/CodingCharts';
 import StatsTabs from '@/components/StatsTabs';
@@ -5,7 +6,7 @@ import StravaStats from '@/components/StravaStats';
 import { codingSeries, fetchContributions, GITHUB, GITHUB_USER } from '@/lib/github';
 import { stravaAPI } from '@/lib/strava';
 
-export const metadata = { title: 'Stats - Vinay Shah' };
+export const metadata = pageMeta('/stats/', 'stats', 'Running miles from Strava and coding contributions from GitHub, drawn as dithered charts.');
 
 // Revalidate the page every 10 minutes (600 seconds)
 export const revalidate = 600;
