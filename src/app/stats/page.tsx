@@ -1,4 +1,8 @@
+import { unstable_cache } from 'next/cache';
+import CodingCharts from '@/components/CodingCharts';
+import StatsTabs from '@/components/StatsTabs';
 import StravaStats from '@/components/StravaStats';
+import { codingSeries, fetchContributions, GITHUB, GITHUB_USER } from '@/lib/github';
 import { stravaAPI } from '@/lib/strava';
 
 export const metadata = { title: 'Stats - Vinay Shah' };
@@ -19,19 +23,34 @@ async function getStravaData() {
   }
 }
 
+// Synced once a day. When a refresh fails, the cache keeps serving the last good calendar.
+const contributions = unstable_cache(() => fetchContributions(), ['github-contributions', GITHUB, GITHUB_USER], { revalidate: 86_400 });
+
+async function getCodingData() {
+  try {
+    return codingSeries(await contributions());
+  } catch (error) {
+    console.error('Failed to fetch GitHub contributions:', error);
+    return null;
+  }
+}
+
+const unavailable = (source: string) => (
+  <div className="row">
+    <span className="dim">{source}</span>
+    <span>couldn&apos;t reach {source} just now. try again in a few minutes.</span>
+  </div>
+);
+
 export default async function StatsPage() {
-  const data = await getStravaData();
+  const [running, coding] = await Promise.all([getStravaData(), getCodingData()]);
 
   return (
     <div className="bd stats">
-      {data ? (
-        <StravaStats stats={data.stats} activities={data.activities} now={data.now} />
-      ) : (
-        <div className="row">
-          <span className="dim">strava</span>
-          <span>couldn&apos;t reach strava just now. try again in a few minutes.</span>
-        </div>
-      )}
+      <StatsTabs
+        running={running ? <StravaStats stats={running.stats} activities={running.activities} now={running.now} /> : unavailable('strava')}
+        coding={coding ? <CodingCharts series={coding} /> : unavailable('github')}
+      />
     </div>
   );
 }

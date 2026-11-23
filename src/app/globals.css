@@ -209,6 +209,72 @@ main,
   height: 110px;
 }
 
+.chart.heat {
+  height: 76px;
+}
+
+.chart.weekday {
+  height: 80px;
+}
+
+/* Stats tabs: running and coding, with the open tab's source on the right. */
+.tabs {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0 12px;
+}
+
+.tabs nav {
+  display: flex;
+  gap: 4px;
+  margin-left: -6px;
+}
+
+.tabs button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 6px;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-radius: 2px;
+  opacity: 0.62;
+  cursor: pointer;
+}
+
+/* Full 44px tap targets on touch screens. */
+@media (pointer: coarse) {
+  .tabs button {
+    min-height: 44px;
+  }
+}
+
+.tabs button[aria-selected='true'] {
+  opacity: 1;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.tabs button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+
+@media (hover: hover) {
+  .tabs button:hover {
+    opacity: 1;
+  }
+}
+
+.sec {
+  display: grid;
+  gap: 14px;
+}
+
 .chart canvas {
   position: absolute;
   inset: 0;

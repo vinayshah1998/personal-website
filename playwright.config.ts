@@ -16,11 +16,11 @@ export default defineConfig({
   webServer: remote
     ? undefined
     : [
-        // The site reads Strava from this mock, so the stats page has data to chart.
+        // The site reads Strava and GitHub from these mocks, so the stats page has data to chart.
         {
-          command: `node tests/e2e/strava-mock-server.mjs`,
+          command: `node tests/e2e/mock-server.mjs`,
           url: `http://127.0.0.1:${mockPort}/health`,
-          env: { STRAVA_MOCK_PORT: String(mockPort) },
+          env: { MOCK_PORT: String(mockPort) },
           reuseExistingServer: false,
         },
         {
@@ -28,6 +28,7 @@ export default defineConfig({
           url: `${local}/`,
           env: {
             STRAVA_BASE_URL: `http://127.0.0.1:${mockPort}`,
+            GITHUB_BASE_URL: `http://127.0.0.1:${mockPort}`,
             STRAVA_CLIENT_ID: 'mock',
             STRAVA_CLIENT_SECRET: 'mock',
             STRAVA_REFRESH_TOKEN: 'mock',

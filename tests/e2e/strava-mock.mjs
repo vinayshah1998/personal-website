@@ -1,5 +1,5 @@
 // A stand-in for the Strava API, for end-to-end tests: a run every other day and a ride every third day since the
-// start of last year, in Los Angeles time. strava-mock-server.mjs serves it.
+// start of last year, in Los Angeles time. mock-server.mjs serves it.
 
 export const TIMEZONE = '(GMT-08:00) America/Los_Angeles';
 const DAY = 86_400_000;

@@ -36,7 +36,7 @@ This is a Next.js 15 personal website using the App Router architecture with the
 - Elements with class `m` are no-ink zones on the canvas
 
 #### Shared Components (`src/components/`)
-- **StravaStats**: Year-to-date totals and the latest run, around **StatsCharts** (client): dithered canvas charts of the last 12 weeks and year to date vs last year, colored by the time-of-day palette. Series come from `src/lib/running.ts`; e2e tests serve Strava from `tests/e2e/strava-mock.mjs`
+- **StravaStats**: Year-to-date totals and the latest run, around **StatsCharts** (client): dithered canvas charts of the last 12 weeks and year to date vs last year, colored by the time-of-day palette. Series come from `src/lib/running.ts`. The stats page has running and coding tabs (**StatsTabs**); **CodingCharts** draws the public GitHub contribution calendar (`src/lib/github.ts`, cached a day). Both chart sets share `src/components/useDither.ts`; e2e tests serve Strava and GitHub from `tests/e2e/mock-server.mjs`
 - **MarkdownContent**: Renders blog markdown in the plain `.doc` style
 
 ### Data Layer (`src/lib/`)

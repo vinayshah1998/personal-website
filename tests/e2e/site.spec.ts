@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { contributionDays } from './github-mock.mjs';
 import { activities } from './strava-mock.mjs';
 
 const shots = process.env.E2E_SHOTS ?? '.audit/screens';
@@ -269,4 +270,51 @@ test('a tap or click on a nav link leaves no focus ring on the new page; Enter f
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/\/blog\/$/);
   await expect.poll(ringed).toBe('blog');
+});
+
+test('the coding tab shows the GitHub calendar: total, heatmap, weekday averages, and streaks', async ({ page, isMobile }, testInfo) => {
+  const errors = trackErrors(page);
+  await page.goto('/stats/');
+  const tabs = page.getByRole('tablist', { name: 'Stats' });
+  await expect(page.getByText('from strava')).toBeVisible();
+  const coding = tabs.getByRole('tab', { name: 'coding' });
+  if (isMobile) await coding.tap();
+  else await coding.click();
+  await expect(coding).toHaveAttribute('aria-selected', 'true');
+  await expect(page).toHaveURL(/#coding$/);
+  await expect(page.getByText('from strava')).toBeHidden();
+  await expect(page.getByText(/synced daily|every day|public and private/)).toHaveCount(0);
+
+  const days = contributionDays();
+  const total = days.reduce((s, d) => s + d.count, 0);
+  await expect(page.locator('.big')).toHaveText(`${total.toLocaleString('en-US')} contributions`);
+  await expect.poll(() => painted(page, '.chart.heat')).toBeGreaterThan(1000);
+  await expect.poll(() => painted(page, '.chart.weekday')).toBeGreaterThan(1000);
+  let longest = 0;
+  days.reduce((run, d) => {
+    const next = d.count ? run + 1 : 0;
+    longest = Math.max(longest, next);
+    return next;
+  }, 0);
+  await expect(page.getByText(new RegExp(`^current \\d+ days?, longest ${longest} days?$`))).toBeVisible();
+  await page.screenshot({ path: `${shots}/${testInfo.project.name}-coding.png` });
+
+  // The heatmap's first column starts on the first Monday; pointing at its top cell names that day.
+  const monday = days.find((d) => (Math.floor(Date.parse(d.date) / 86_400_000) + 3) % 7 === 0)!;
+  const [, mm, dd] = monday.date.split('-').map(Number);
+  const month = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'][mm - 1];
+  const heat = (await page.locator('.chart.heat').boundingBox())!;
+  if (isMobile) await page.touchscreen.tap(heat.x + 2, heat.y + 24);
+  else await page.mouse.move(heat.x + 2, heat.y + 24);
+  await expect(page.locator('.chart.heat .tip')).toHaveText(`mon ${month} ${dd}, ${monday.count} contribution${monday.count === 1 ? '' : 's'}`);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+
+  // A link to #coding opens the tab, and the arrow keys move between tabs.
+  await page.goto('/stats/#coding');
+  await expect(coding).toHaveAttribute('aria-selected', 'true');
+  await coding.focus();
+  await page.keyboard.press('ArrowLeft');
+  await expect(tabs.getByRole('tab', { name: 'running' })).toBeFocused();
+  await expect(page.locator('.chart.area')).toBeVisible();
+  expect(errors).toEqual([]);
 });
