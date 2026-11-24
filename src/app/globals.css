@@ -106,30 +106,15 @@ main,
   -webkit-touch-callout: none;
 }
 
-.home-name {
-  position: absolute;
-  top: calc(16px + var(--safe-t));
-  left: calc(18px + var(--safe-l));
-  font: inherit;
-}
-
 .home-clock {
   position: absolute;
-  top: calc(16px + var(--safe-t));
   right: calc(18px + var(--safe-r));
+  bottom: calc(16px + var(--safe-b));
   font-variant-numeric: tabular-nums;
 }
 
-.homenav {
-  position: absolute;
-  left: calc(12px + var(--safe-l));
-  bottom: calc(4px + var(--safe-b));
-  display: flex;
-  flex-wrap: wrap;
-}
-
-/* Every other page: the ink folds into a band at the top, holding the name and links. The header is in the flow,
-   so larger text wraps it onto more lines and pushes the content down instead of overlapping it. */
+/* The name and links, on every page: over the full-screen ink on the homepage and in the band elsewhere. The header
+   is in the flow, so larger text wraps it onto more lines and pushes the content down instead of overlapping it. */
 .hd {
   margin: 0 calc(12px + var(--safe-r)) 0 calc(12px + var(--safe-l));
   padding-top: calc(2px + var(--safe-t));
@@ -137,6 +122,15 @@ main,
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 0 8px;
+}
+
+.hd .nm {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 6px;
+  font: inherit;
+  white-space: pre;
 }
 
 .hd nav {
@@ -907,14 +901,14 @@ main,
 }
 
 .mini-clock {
-  top: 8px;
+  bottom: 8px;
   right: 10px;
   font-variant-numeric: tabular-nums;
 }
 
 .mini-nav {
-  bottom: 6px;
-  left: 10px;
+  top: 8px;
+  right: 10px;
   word-spacing: 1ch;
 }
 

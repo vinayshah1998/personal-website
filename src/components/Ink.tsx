@@ -360,26 +360,26 @@ export default function Ink() {
   return (
     <>
       <canvas ref={canvasRef} className="ink" aria-hidden="true" />
-      {home ? (
-        <div className="site home" data-scr>
-          <h1 className="m home-name">vinay shah</h1>
-          <div className="m dim home-clock" data-noscr>
-            {time}
-          </div>
-          <nav className="homenav m" aria-label="Site">
-            {links}
-          </nav>
-        </div>
-      ) : (
-        <header className="site hd" data-scr>
-          <Link href="/" className="lk m">
-            vinay shah
-          </Link>
+      {/* One header for every page, so the name and links stay put while the ink folds between screen and band. */}
+      <div className={home ? 'site home' : 'site'} data-scr>
+        <header className="hd">
+          {home ? (
+            <h1 className="nm m">vinay shah</h1>
+          ) : (
+            <Link href="/" className="lk m">
+              vinay shah
+            </Link>
+          )}
           <nav className="m" aria-label="Site">
             {links}
           </nav>
         </header>
-      )}
+        {home && (
+          <div className="m dim home-clock" data-noscr>
+            {time}
+          </div>
+        )}
+      </div>
     </>
   );
 }

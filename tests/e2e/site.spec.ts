@@ -61,8 +61,12 @@ test('every page renders, and the nav moves between them without resetting the i
   await page.screenshot({ path: `${shots}/${testInfo.project.name}-home.png` });
 
   await page.evaluate(() => ((window as unknown as { ink: Element }).ink = document.querySelector('canvas.ink')!));
+  // The name and links sit in the same header on every page, so they stay put as the ink folds into the band.
+  const header = () => page.locator('.hd > *, .hd nav a').evaluateAll((els) => els.map((e) => JSON.stringify(e.getBoundingClientRect())));
+  const onHome = await header();
   await nav.getByRole('link', { name: 'projects' }).click();
   await expect(page).toHaveURL(/\/projects\/$/);
+  expect(await header()).toEqual(onHome);
   await expect(page.getByRole('link', { name: /^llm_time_blocker/ })).toHaveAttribute('href', 'https://github.com/vinayshah1998/llm_time_blocker');
   await expect(nav.getByRole('link', { name: 'projects' })).toHaveAttribute('aria-current', 'page');
 
@@ -174,8 +178,15 @@ test('the homepage fills the first screen and its links fit with 44px targets', 
       const box = (await link.boundingBox())!;
       expect(box.height, `${await link.innerText()} at ${width}px`).toBeGreaterThanOrEqual(44);
       expect(box.x + box.width).toBeLessThanOrEqual(width);
-      expect(box.y + box.height).toBeLessThanOrEqual(height);
+      // Top right, with the name on the same line.
+      expect(box.y, `${await link.innerText()} at ${width}px`).toBeLessThan(10);
     }
+    const nav = (await page.getByRole('navigation', { name: 'Site' }).boundingBox())!;
+    expect(width - (nav.x + nav.width)).toBeLessThanOrEqual(20);
+    // The clock sits at the bottom right.
+    const clock = (await page.locator('.home-clock').boundingBox())!;
+    expect(height - (clock.y + clock.height)).toBeLessThanOrEqual(20);
+    expect(width - (clock.x + clock.width)).toBeLessThanOrEqual(20);
   }
 });
 
@@ -375,7 +386,6 @@ test('under reduced motion the stats charts and headline appear at once', async 
 test('a tap or click on a nav link leaves no focus ring on the new page; Enter from the keyboard does', async ({ page, isMobile }) => {
   const nav = page.getByRole('navigation', { name: 'Site' });
   const ringed = () => page.evaluate(() => document.querySelector(':focus-visible')?.textContent ?? null);
-  const focused = () => page.evaluate(() => document.activeElement?.textContent ?? null);
 
   await page.goto('/');
   const projects = nav.getByRole('link', { name: 'projects' });
@@ -384,8 +394,8 @@ test('a tap or click on a nav link leaves no focus ring on the new page; Enter f
   await expect(page).toHaveURL(/\/projects\/$/);
   await expect(nav.getByRole('link', { name: 'projects' })).toHaveAttribute('aria-current', 'page');
   await page.waitForTimeout(200);
+  // The nav stays mounted across pages, so the tapped link keeps the browser's own focus, without a ring.
   expect(await ringed()).toBeNull();
-  expect(await focused()).not.toBe('projects');
   expect(await page.evaluate(() => getComputedStyle(document.querySelector('.lk')!).getPropertyValue('-webkit-tap-highlight-color'))).toBe('rgba(0, 0, 0, 0)');
 
   await page.goto('/');
