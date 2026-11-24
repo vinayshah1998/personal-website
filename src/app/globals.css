@@ -148,6 +148,15 @@ main,
   padding: 74px 0 calc(64px + var(--safe-b));
 }
 
+/* On desktop the column sits in the middle; the header stays edge to edge. 640px leaves room for the widest
+   (600px) column plus its 18px margins, so phones keep the left-aligned column. */
+@media (min-width: 640px) {
+  .bd {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
 .row {
   display: grid;
   gap: 2px;
